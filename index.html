@@ -1,0 +1,2523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AAFM India - Marketing Budget Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* =========================
+           THEME TOKENS (DEFAULT: DARK)
+           ========================= */
+        :root {
+            --bg-primary: #0b0f17;
+            --bg-secondary: rgba(255, 255, 255, 0.06);
+            --bg-card: rgba(255, 255, 255, 0.07);
+            --bg-hover: rgba(255, 255, 255, 0.10);
+            --text-primary: #f8fafc;
+            --text-secondary: rgba(248, 250, 252, 0.82);
+            --text-muted: rgba(248, 250, 252, 0.55);
+
+            --accent-blue: #3b82f6;
+            --accent-blue-light: #60a5fa;
+            --accent-green: #10b981;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --accent-yellow: #f59e0b;
+            --accent-teal: #14b8a6;
+
+            --border-color: rgba(255, 255, 255, 0.12);
+            --shadow-color: rgba(0, 0, 0, 0.35);
+
+            --modern-bg-1: #06070b;
+            --modern-bg-2: #0b1220;
+            --modern-bg-3: #0e0f14;
+
+            /* Chart palette */
+            --chart-google: #7cb3ff;
+            --chart-meta: #8fd0ff;
+
+            /* Table header bg */
+            --thead-bg: rgba(59, 130, 246, 0.55);
+        }
+
+        /* =========================
+           LIGHT THEME OVERRIDES
+           (applied when body[data-theme="light"])
+           ========================= */
+        body[data-theme="light"] {
+            --bg-primary: #f6f7fb;
+            --bg-secondary: rgba(15, 23, 42, 0.06);
+            --bg-card: rgba(255, 255, 255, 0.70);
+            --bg-hover: rgba(15, 23, 42, 0.06);
+
+            --text-primary: #0f172a;
+            --text-secondary: rgba(15, 23, 42, 0.80);
+            --text-muted: rgba(15, 23, 42, 0.55);
+
+            --border-color: rgba(15, 23, 42, 0.12);
+            --shadow-color: rgba(2, 6, 23, 0.12);
+
+            --modern-bg-1: #f6f7fb;
+            --modern-bg-2: #eef2ff;
+            --modern-bg-3: #f8fafc;
+
+            --chart-google: #2563eb;
+            --chart-meta: #0ea5e9;
+
+            --thead-bg: rgba(37, 99, 235, 0.22);
+        }
+
+        body {
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.18) 0%, transparent 40%),
+                radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.18) 0%, transparent 42%),
+                radial-gradient(circle at 55% 10%, rgba(20, 184, 166, 0.12) 0%, transparent 35%),
+                linear-gradient(135deg, var(--modern-bg-1) 0%, var(--modern-bg-2) 45%, var(--modern-bg-3) 100%);
+            background-attachment: fixed;
+            transition: background 0.35s ease, color 0.25s ease;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.45),
+                inset 0 1px 0 rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(18px) saturate(170%);
+            -webkit-backdrop-filter: blur(18px) saturate(170%);
+        }
+
+        /* Make glass adapt in light mode */
+        body[data-theme="light"] .glass {
+            background: rgba(255, 255, 255, 0.70);
+            border: 1px solid rgba(15, 23, 42, 0.10);
+            box-shadow:
+                0 18px 40px rgba(2, 6, 23, 0.10),
+                inset 0 1px 0 rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(18px) saturate(140%);
+            -webkit-backdrop-filter: blur(18px) saturate(140%);
+        }
+
+        .login-screen {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+            background:
+                radial-gradient(circle at 18% 30%, rgba(59, 130, 246, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 82% 70%, rgba(139, 92, 246, 0.18) 0%, transparent 45%),
+                linear-gradient(135deg, var(--modern-bg-1) 0%, var(--modern-bg-2) 50%, var(--modern-bg-3) 100%);
+            backdrop-filter: blur(10px);
+        }
+
+        .login-screen.hidden { opacity: 0; pointer-events: none; }
+
+        .login-container {
+            border-radius: 22px;
+            padding: 42px 40px;
+            width: 92%;
+            max-width: 440px;
+            text-align: center;
+        }
+
+        .login-header { margin-bottom: 30px; }
+
+        .company-logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
+
+        .company-logo-circle {
+            width: 84px; height: 84px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 16px;
+            border: 3px solid rgba(255, 255, 255, 0.20);
+            box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+        }
+        .company-logo-circle i { font-size: 2.6rem; color: white; }
+
+        .company-name { font-size: 1.85rem; font-weight: 750; color: white; letter-spacing: 0.4px; }
+        .company-tagline { font-size: 0.95rem; color: rgba(255, 255, 255, 0.72); margin-top: 6px; }
+
+        .user-avatar { margin: 18px 0 22px; }
+        .avatar-container { position: relative; width: 104px; height: 104px; margin: 0 auto 14px; }
+
+        .avatar-img {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.28);
+        }
+
+        .avatar-placeholder {
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+            display: flex; align-items: center; justify-content: center;
+            border: 3px solid rgba(255, 255, 255, 0.28);
+        }
+        .avatar-placeholder i { font-size: 2.5rem; color: white; }
+
+        .username-display { font-size: 1.15rem; color: white; font-weight: 600; margin-bottom: 6px; }
+        .user-role { font-size: 0.9rem; color: rgba(255, 255, 255, 0.62); }
+
+        .password-input-container { position: relative; margin-bottom: 18px; }
+        .password-input {
+            width: 100%;
+            padding: 15px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            border-radius: 12px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.25s;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: rgba(96, 165, 250, 0.7);
+            background: rgba(255, 255, 255, 0.10);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+        }
+        .password-input::placeholder { color: rgba(255, 255, 255, 0.55); }
+
+        .password-toggle {
+            position: absolute;
+            right: 14px; top: 50%;
+            transform: translateY(-50%);
+            background: none; border: none;
+            color: rgba(255, 255, 255, 0.55);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .password-toggle:hover { color: white; }
+
+        .login-button {
+            width: 100%;
+            padding: 14px 15px;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 650;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+            margin-bottom: 14px;
+            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+        }
+        .login-button:hover { transform: translateY(-2px); filter: brightness(1.03); }
+        .login-button:active { transform: translateY(0); }
+
+        .login-footer { margin-top: 18px; font-size: 0.85rem; color: rgba(255, 255, 255, 0.52); }
+
+        .login-error {
+            color: #fecaca;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .app-shell {
+            display: grid;
+            grid-template-columns: 270px 1fr;
+            min-height: 100vh;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+        .app-shell.visible { opacity: 1; }
+
+        .sidebar {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            padding: 18px;
+            border-right: 1px solid rgba(255, 255, 255, 0.10);
+            display: flex;
+            flex-direction: column;
+        }
+        body[data-theme="light"] .sidebar {
+            border-right: 1px solid rgba(15, 23, 42, 0.10);
+        }
+
+        .sidebar .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 14px;
+            border-radius: 16px;
+            margin-bottom: 14px;
+        }
+
+        .sidebar .brand .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+        .sidebar .brand .logo i { color: #fff; }
+
+        .sidebar .brand .titles { display: flex; flex-direction: column; line-height: 1.05; }
+        .sidebar .brand .titles .name { font-weight: 800; letter-spacing: 0.2px; }
+        .sidebar .brand .titles .sub { font-size: 0.82rem; color: var(--text-muted); margin-top: 4px; }
+
+        .nav { margin-top: 10px; display: flex; flex-direction: column; gap: 8px; }
+
+        .nav button {
+            width: 100%;
+            text-align: left;
+            padding: 12px 12px;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.2s, border-color 0.2s, transform 0.15s;
+        }
+
+        .nav button:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); }
+        body[data-theme="light"] .nav button:hover { background: rgba(15,23,42,0.06); border-color: rgba(15,23,42,0.08); }
+
+        .nav button.active {
+            background: rgba(255,255,255,0.09);
+            border-color: rgba(255,255,255,0.16);
+            color: var(--text-primary);
+        }
+        body[data-theme="light"] .nav button.active {
+            background: rgba(15,23,42,0.06);
+            border-color: rgba(15,23,42,0.12);
+        }
+
+        .nav button i {
+            width: 18px;
+            text-align: center;
+            color: rgba(96, 165, 250, 0.95);
+        }
+
+        .sidebar-footer { margin-top: auto; padding-top: 14px; }
+
+        .sidebar-user { display: flex; align-items: center; gap: 10px; padding: 12px; border-radius: 16px; }
+
+        .user-avatar-small {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06);
+        }
+        body[data-theme="light"] .user-avatar-small {
+            border: 1px solid rgba(15,23,42,0.10);
+            background: rgba(255,255,255,0.55);
+        }
+
+        .user-avatar-small img { width: 100%; height: 100%; object-fit: cover; }
+
+        .sidebar-user .meta { display: flex; flex-direction: column; }
+        .sidebar-user .meta .u { font-size: 0.95rem; font-weight: 650; }
+        .sidebar-user .meta .r { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+
+        .sidebar-actions { display: flex; gap: 10px; margin-top: 12px; }
+
+        .icon-btn {
+            width: 44px; height: 44px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.14);
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: transform 0.15s, background 0.2s, border-color 0.2s;
+        }
+        .icon-btn:hover { background: rgba(255,255,255,0.10); transform: translateY(-1px); }
+        body[data-theme="light"] .icon-btn {
+            border-color: rgba(15,23,42,0.12);
+            background: rgba(255,255,255,0.65);
+        }
+        body[data-theme="light"] .icon-btn:hover { background: rgba(255,255,255,0.85); }
+
+        /* Theme toggle pill */
+        .theme-toggle {
+            margin-top: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 16px;
+        }
+        .theme-toggle .label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 0.92rem;
+        }
+        .switch {
+            position: relative;
+            width: 56px;
+            height: 32px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.10);
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            flex: 0 0 auto;
+        }
+        body[data-theme="light"] .switch {
+            border-color: rgba(15,23,42,0.12);
+            background: rgba(15,23,42,0.06);
+        }
+        .switch .knob {
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+            transition: left 0.22s ease;
+            box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+        }
+        body[data-theme="light"] .switch .knob { box-shadow: 0 10px 18px rgba(2,6,23,0.14); }
+        .switch[data-on="1"] .knob { left: 27px; }
+
+        .main { padding: 20px; }
+        .container { max-width: 1800px; margin: 0 auto; }
+
+        .page { display: none; }
+        .page.active { display: block; }
+
+        .dashboard-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
+            color: white;
+            padding: 26px 28px;
+            border-radius: 18px;
+            margin-bottom: 22px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.14);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-header::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 18% 30%, rgba(255,255,255,0.10) 0%, transparent 40%),
+                radial-gradient(circle at 82% 70%, rgba(255,255,255,0.06) 0%, transparent 45%);
+            pointer-events: none;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            gap: 14px;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+            justify-content: center;
+        }
+
+        .brand-logo {
+            width: 58px;
+            height: 58px;
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-logo i { font-size: 1.55rem; color: white; }
+
+        .brand-text .brand-name {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .brand-text .brand-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            color: rgba(255,255,255,0.88);
+            margin-top: 6px;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .dashboard-title {
+            font-size: 1.2rem;
+            margin-top: 10px;
+            position: relative;
+            z-index: 1;
+            font-weight: 650;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .month-selector {
+            justify-content: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 14px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .month-btn {
+            padding: 6px 12px;
+            background-color: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+        }
+
+        .month-btn.active {
+            background-color: rgba(255,255,255,0.92);
+            color: rgba(30, 41, 59, 1);
+            font-weight: 700;
+        }
+
+        .month-btn:hover { background-color: rgba(255, 255, 255, 0.18); }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+
+        .card {
+            border-radius: 18px;
+            padding: 20px;
+            transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+            height: 100%;
+        }
+
+        .card.glass:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.085);
+            box-shadow:
+                0 26px 60px rgba(0,0,0,0.50),
+                inset 0 1px 0 rgba(255,255,255,0.14);
+        }
+        body[data-theme="light"] .card.glass:hover {
+            background: rgba(255,255,255,0.85);
+            box-shadow:
+                0 26px 60px rgba(2,6,23,0.14),
+                inset 0 1px 0 rgba(255,255,255,0.65);
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 14px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        body[data-theme="light"] .card-title { border-bottom: 1px solid rgba(15,23,42,0.10); }
+
+        .card-title i { color: var(--accent-blue-light); }
+
+        .kpi-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
+
+        .kpi {
+            padding: 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            transition: all 0.2s;
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+        body[data-theme="light"] .kpi {
+            background: rgba(255,255,255,0.70);
+            border: 1px solid rgba(15,23,42,0.10);
+        }
+
+        .kpi:hover { background: rgba(255,255,255,0.09); }
+        body[data-theme="light"] .kpi:hover { background: rgba(255,255,255,0.88); }
+
+        .kpi-label { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
+        .kpi-value { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 5px; }
+        .kpi-change { font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
+        .positive { color: var(--accent-green); }
+        .negative { color: var(--accent-red); }
+
+        .platform-badges { display: flex; justify-content: flex-start; gap: 12px; margin: 10px 0 12px; flex-wrap: wrap; }
+
+        .platform-badge {
+            padding: 8px 14px;
+            border-radius: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+            transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+        body[data-theme="light"] .platform-badge {
+            border: 1px solid rgba(15,23,42,0.10);
+            background: rgba(255,255,255,0.72);
+        }
+
+        .platform-badge:hover { transform: translateY(-1px); }
+        .google-badge i { color: var(--chart-google); }
+        .meta-badge i { color: var(--chart-meta); }
+
+        .course-budget-list { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+
+        .course-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            transition: transform 0.15s, background 0.2s, border-color 0.2s;
+        }
+        body[data-theme="light"] .course-item {
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(15,23,42,0.10);
+        }
+
+        .course-item:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.16); transform: translateY(-1px); }
+        body[data-theme="light"] .course-item:hover { background: rgba(255,255,255,0.88); border-color: rgba(15,23,42,0.12); }
+
+        .course-name {
+            color: rgba(248, 250, 252, 0.90);
+            font-weight: 700;
+            font-size: 0.95rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 70%;
+        }
+        body[data-theme="light"] .course-name { color: rgba(15,23,42,0.88); }
+
+        .course-amount { color: rgba(147, 197, 253, 0.95); font-weight: 850; font-size: 0.95rem; white-space: nowrap; }
+        body[data-theme="light"] .course-amount { color: rgba(37, 99, 235, 0.95); }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 18px;
+            margin-bottom: 22px;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        body[data-theme="light"] .table-container { border: 1px solid rgba(15,23,42,0.10); }
+
+        .table-container.glass { padding-bottom: 8px; }
+
+        table { width: 100%; border-collapse: collapse; background: transparent; }
+
+        thead {
+            background: var(--thead-bg);
+            color: var(--text-primary);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+
+        th {
+            padding: 14px 12px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.95rem;
+            white-space: nowrap;
+            border-bottom: 1px solid rgba(255,255,255,0.14);
+        }
+        body[data-theme="light"] th { border-bottom: 1px solid rgba(15,23,42,0.10); }
+
+        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.10); transition: background-color 0.2s; }
+        tbody tr:hover { background-color: rgba(255,255,255,0.06); }
+        body[data-theme="light"] tbody tr { border-bottom: 1px solid rgba(15,23,42,0.08); }
+        body[data-theme="light"] tbody tr:hover { background-color: rgba(15,23,42,0.04); }
+
+        td { padding: 12px; color: var(--text-secondary); font-size: 0.9rem; }
+
+        .data-highlight { color: rgba(147, 197, 253, 0.95); font-weight: 700; }
+        body[data-theme="light"] .data-highlight { color: rgba(37, 99, 235, 0.95); }
+
+        .btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, filter 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(96, 165, 250, 0.95) 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(13, 167, 101, 0.95) 100%);
+            color: white;
+        }
+
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+
+        .integration-hero { padding: 18px; border-radius: 18px; margin-bottom: 18px; }
+
+        .integration-hero h2 { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; margin-bottom: 8px; }
+        .integration-hero p { color: var(--text-secondary); margin-top: 4px; line-height: 1.35; }
+
+        .sheet-input { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+        .sheet-input input {
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            min-width: 320px;
+            font-size: 0.92rem;
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+        body[data-theme="light"] .sheet-input input {
+            border: 1px solid rgba(15,23,42,0.12);
+            background: rgba(255,255,255,0.75);
+        }
+
+        .sheet-input input::placeholder { color: rgba(255, 255, 255, 0.65); }
+        body[data-theme="light"] .sheet-input input::placeholder { color: rgba(15,23,42,0.55); }
+
+        .sheet-input input:focus {
+            outline: none;
+            border-color: rgba(96,165,250,0.7);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+        }
+
+        .loading { display: none; text-align: left; padding: 12px 2px 0; color: var(--text-secondary); }
+        .loading i { animation: spin 1s linear infinite; margin-right: 8px; }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .ad-account-report { border-radius: 18px; padding: 18px; margin-bottom: 22px; }
+
+        .ad-account-report h3 {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            color: var(--text-primary);
+        }
+
+        .ad-account-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+        .ad-account-card { border-radius: 16px; padding: 14px; }
+
+        .ad-account-id {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        .ad-account-name { font-size: 1.05rem; font-weight: 750; margin-bottom: 10px; color: var(--text-primary); }
+        .ad-account-metrics { margin-top: 8px; }
+
+        .ad-metric { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.92rem; }
+        .ad-metric-label { color: var(--text-muted); }
+        .ad-metric-value { font-weight: 750; color: rgba(147, 197, 253, 0.95); }
+        body[data-theme="light"] .ad-metric-value { color: rgba(37,99,235,0.95); }
+
+        .ad-account-total { border-radius: 16px; padding: 14px; margin-top: 14px; text-align: center; }
+        .ad-total-label { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 650; }
+        .ad-total-value { font-size: 1.8rem; font-weight: 900; color: var(--accent-green); }
+        .ad-total-sub { font-size: 0.9rem; color: var(--text-muted); margin-top: 6px; }
+
+        /* NEW: Side-by-side layout for Google + Meta ad account spends */
+        .ad-spends-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 22px;
+        }
+        @media (max-width: 980px) {
+            .ad-spends-row { grid-template-columns: 1fr; }
+        }
+
+        .platform-filter { display: flex; gap: 10px; margin: 12px 15px 0; flex-wrap: wrap; }
+
+        .filter-btn {
+            padding: 8px 14px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            border: 1px solid rgba(255,255,255,0.14);
+            background: rgba(255,255,255,0.06);
+            color: var(--text-secondary);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+        body[data-theme="light"] .filter-btn {
+            border: 1px solid rgba(15,23,42,0.12);
+            background: rgba(255,255,255,0.72);
+        }
+
+        .filter-btn.active {
+            background: rgba(59, 130, 246, 0.55);
+            color: white;
+            border-color: rgba(59, 130, 246, 0.65);
+        }
+        body[data-theme="light"] .filter-btn.active {
+            background: rgba(37, 99, 235, 0.18);
+            color: rgba(15,23,42,0.92);
+            border-color: rgba(37, 99, 235, 0.30);
+        }
+
+        .filter-btn:hover { background: rgba(255,255,255,0.10); }
+        body[data-theme="light"] .filter-btn:hover { background: rgba(255,255,255,0.88); }
+
+        footer {
+            text-align: center;
+            padding: 18px 10px;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255,255,255,0.10);
+            margin-top: 10px;
+        }
+        body[data-theme="light"] footer { border-top: 1px solid rgba(15,23,42,0.10); }
+
+        /* Campaign Details toggle (existing) */
+        .campaign-toggle-bar {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-start;
+            margin: 0 0 14px 0;
+            flex-wrap: wrap;
+        }
+        .campaign-table-hidden { display: none !important; }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.14);
+        }
+        body[data-theme="light"] .btn-outline {
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(15,23,42,0.12);
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.10); }
+        body[data-theme="light"] .btn-outline:hover { background: rgba(255,255,255,0.88); }
+
+        /* NEW: Course filters (Department + HOD) */
+        .course-filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+            padding: 14px 15px 0;
+        }
+        .course-filters .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 240px;
+        }
+        .course-filters label {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .course-filters select {
+            padding: 10px 12px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.14);
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            outline: none;
+        }
+        body[data-theme="light"] .course-filters select {
+            border: 1px solid rgba(15,23,42,0.12);
+            background: rgba(255,255,255,0.72);
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 980px) {
+            .app-shell { grid-template-columns: 1fr; }
+            .sidebar { position: relative; height: auto; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .kpi-container { grid-template-columns: 1fr; }
+            .sheet-input { flex-direction: column; }
+            .sheet-input input { min-width: 100%; }
+            .course-filters .filter-group { min-width: 100%; }
+        }
+
+        .section-gap { margin-bottom: 22px; }
+        /* =========================
+   Select / Dropdown Visibility Fix
+   ========================= */
+select {
+  color: var(--text-primary) !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+  border-radius: 14px;
+  padding: 10px 14px;
+  outline: none;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+/* Dropdown list items */
+select option {
+  color: var(--text-primary) !important;
+  background: var(--bg-primary) !important; /* ensures list isn't white */
+}
+
+/* Improve native control rendering in dark mode */
+body[data-theme="dark"] select {
+  color-scheme: dark;
+}
+
+body[data-theme="light"] select {
+  color-scheme: light;
+  background: rgba(255,255,255,0.72) !important;
+  border: 1px solid rgba(15,23,42,0.12) !important;
+}
+
+body[data-theme="light"] select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* =========================
+/* =========================
+   COURSE-WISE FILTER UI FIXES
+   ========================= */
+
+/* Make the table container have breathing space */
+#courseWisePage .table-container.glass {
+  padding-top: 12px;
+}
+
+/* Control spacing for the "Course Breakdown" title */
+#courseWisePage .course-breakdown-title {
+  margin: 12px 15px 14px !important; /* top, left/right, bottom */
+}
+
+/* Filter row layout + spacing */
+#courseWisePage .course-filters {
+  display: flex;
+  gap: 14px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+
+  margin: 0 15px 18px;      /* fixes header-to-filter spacing */
+  padding-top: 6px;         /* extra air under title */
+}
+
+/* Labels */
+#courseWisePage .course-filters label {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+/* ✅ Dropdown visibility fix: select + options */
+#courseWisePage .course-filters select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 14px;
+
+  color: var(--text-primary) !important;
+  background: rgba(255,255,255,0.06) !important;
+  border: 1px solid rgba(255,255,255,0.14) !important;
+
+  outline: none;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
+/* Dropdown options list */
+#courseWisePage .course-filters select option {
+  color: var(--text-primary) !important;
+  background: var(--bg-primary) !important;
+}
+
+/* Force correct native rendering for dark mode dropdowns (Windows Chrome fix) */
+body[data-theme="dark"] #courseWisePage .course-filters select {
+  color-scheme: dark;
+}
+
+/* Light mode overrides */
+body[data-theme="light"] #courseWisePage .course-filters select {
+  color-scheme: light;
+  background: rgba(255,255,255,0.75) !important;
+  border: 1px solid rgba(15,23,42,0.12) !important;
+  color: rgba(15,23,42,0.92) !important;
+}
+
+body[data-theme="light"] #courseWisePage .course-filters select option {
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+
+
+    </style>
+</head>
+
+<body data-theme="dark">
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container glass">
+            <div class="login-header">
+                <div class="company-logo">
+                    <div class="company-logo-circle">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="company-name">AAFM India</div>
+                    <div class="company-tagline">Marketing Dashboard</div>
+                </div>
+            </div>
+
+            <div class="user-avatar">
+                <div class="avatar-container">
+                    <div class="avatar-placeholder" id="avatarPlaceholder">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <img id="avatarImage" class="avatar-img" style="display:none;" alt="User Avatar" />
+                </div>
+
+                <div class="username-display">AAFM India</div>
+                <div class="user-role">Digital Marketing Team</div>
+            </div>
+
+            <div class="password-input-container">
+                <input type="password" class="password-input" id="passwordInput" placeholder="Enter password" />
+                <button class="password-toggle" id="passwordToggle" aria-label="Toggle password visibility">
+                    <i class="fas fa-eye"></i>
+                </button>
+            </div>
+
+            <div class="login-error" id="loginError">
+                <i class="fas fa-exclamation-circle"></i> Incorrect password. Please try again.
+            </div>
+
+            <button class="login-button" id="loginButton">
+                <i class="fas fa-sign-in-alt"></i> Sign In
+            </button>
+
+            <div class="login-footer">
+                <p>Enter your dashboard password to continue</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Shell (Sidebar + Main) -->
+    <div class="app-shell" id="appShell">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="brand glass">
+                <div class="logo"><i class="fas fa-chart-line"></i></div>
+                <div class="titles">
+                    <div class="name">AAFM India</div>
+                    <div class="sub">Marketing Budget</div>
+                </div>
+            </div>
+
+            <!-- Sidebar Tabs -->
+            <nav class="nav">
+                <button class="active" data-page="dashboardPage"><i class="fas fa-grid-2"></i> Dashboard</button>
+                <button data-page="courseWisePage"><i class="fas fa-graduation-cap"></i> Course-Wise Budget</button>
+                <button data-page="campaignDetailsPage"><i class="fas fa-list-alt"></i> Campaign Details</button>
+                <button data-page="monthlySummaryPage"><i class="fas fa-calendar-alt"></i> Monthly Summary</button>
+                <button data-page="integrationsPage"><i class="fas fa-plug"></i> Integrations</button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-user glass">
+                    <div class="user-avatar-small">
+                        <img id="avatarImageSmall" alt="User Avatar" />
+                    </div>
+                    <div class="meta">
+                        <div class="u">AAFM India</div>
+                        <div class="r">Digital Marketing</div>
+                    </div>
+                </div>
+
+                <!-- Theme Toggle -->
+                <div class="theme-toggle glass" style="margin-top:12px;">
+                    <div class="label">
+                        <i class="fas fa-moon" id="themeIcon"></i>
+                        <span id="themeText">Dark Mode</span>
+                    </div>
+                    <div class="switch" id="themeSwitch" data-on="1" role="switch" aria-checked="true" tabindex="0">
+                        <div class="knob"></div>
+                    </div>
+                </div>
+
+                <div class="sidebar-actions">
+                    <button class="icon-btn" id="editAvatarBtn" title="Set Profile Photo">
+                        <i class="fas fa-user-pen"></i>
+                    </button>
+                    <button class="icon-btn" id="logoutButton" title="Logout">
+                        <i class="fas fa-right-from-bracket"></i>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <div class="container">
+
+                <!-- DASHBOARD PAGE -->
+                <section class="page active" id="dashboardPage">
+                    <header class="dashboard-header">
+                        <div class="brand-header">
+                            <div class="brand-logo"><i class="fas fa-chart-line"></i></div>
+                            <div class="brand-text">
+                                <div class="brand-name">Dashboard</div>
+                                <div class="brand-subtitle">Marketing Budget Dashboard</div>
+                            </div>
+                        </div>
+
+                        <h1 class="dashboard-title"><i class="fas fa-chart-pie"></i> Comprehensive Analysis of Google Ads and Meta Ads Campaigns</h1>
+
+                        <div class="month-selector" id="monthSelector">
+                            <button class="month-btn active" data-month="all">All Months</button>
+                            <!-- Months added dynamically -->
+                        </div>
+                    </header>
+
+                    <div class="card glass section-gap">
+                        <h3 class="card-title"><i class="fas fa-wallet"></i> Total Marketing Budget Overview (Google + Meta)</h3>
+                        <div class="kpi-container">
+                            <div class="kpi">
+                                <div class="kpi-label">Total Spent</div>
+                                <div class="kpi-value" id="totalBudget">₹0</div>
+                                <div class="kpi-change" id="budgetChange">--</div>
+                            </div>
+                            <div class="kpi">
+                                <div class="kpi-label">Total Leads</div>
+                                <div class="kpi-value" id="totalLeads">0</div>
+                                <div class="kpi-change" id="leadsChange">--</div>
+                            </div>
+                            <div class="kpi">
+                                <div class="kpi-label">Avg. Cost/Lead</div>
+                                <div class="kpi-value" id="avgCost">₹0</div>
+                                <div class="kpi-change" id="costChange">--</div>
+                            </div>
+                            <div class="kpi">
+                                <div class="kpi-label">Total Campaigns</div>
+                                <div class="kpi-value" id="totalCampaigns">0</div>
+                                <div class="kpi-change" id="campaignsChange">--</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NEW: Side-by-side Ad Account Spend Sections -->
+                    <div class="ad-spends-row">
+                        <!-- Google Ad Account Report -->
+                        <div class="ad-account-report glass">
+                            <h3><i class="fab fa-google"></i> Google Ad Account Spends (April to December)</h3>
+                            <div class="ad-account-grid" id="adAccountGrid">
+                                <div class="ad-account-card glass">
+                                    <div class="ad-account-id">876-829-1265</div>
+                                    <div class="ad-account-name">AAFM India</div>
+                                    <div class="ad-account-metrics">
+                                        <div class="ad-metric">
+                                            <span class="ad-metric-label">Budget Spent:</span>
+                                            <span class="ad-metric-value">₹462,691.98</span>
+                                        </div>
+                                        <div class="ad-metric">
+                                            <span class="ad-metric-label">Avg CPC:</span>
+                                            <span class="ad-metric-value">₹491</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="ad-account-total glass">
+                                <div class="ad-total-label">Total Spends on Google Adwords with all Ad Accounts Combined</div>
+                                <div class="ad-total-value" id="totalGoogleSpend">₹0.00</div>
+                                <div class="ad-total-sub">April to December 2025</div>
+                            </div>
+                        </div>
+
+                        <!-- NEW: Meta Ad Account Report -->
+                        <div class="ad-account-report glass">
+                            <h3><i class="fab fa-facebook"></i> Meta Ad Account Spends (April to December)</h3>
+
+                            <div class="ad-account-grid" id="metaAdAccountGrid">
+                                <div class="ad-account-card glass">
+                                    <div class="ad-account-id">META-ACCOUNT</div>
+                                    <div class="ad-account-name">Meta Ads</div>
+                                    <div class="ad-account-metrics">
+                                        <div class="ad-metric">
+                                            <span class="ad-metric-label">Budget Spent:</span>
+                                            <span class="ad-metric-value">₹0.00</span>
+                                        </div>
+                                        <div class="ad-metric">
+                                            <span class="ad-metric-label">Avg CPC:</span>
+                                            <span class="ad-metric-value">₹0.00</span>
+                                        </div>
+                                        <div class="ad-metric">
+                                            <span class="ad-metric-label">Campaigns:</span>
+                                            <span class="ad-metric-value">0</span>
+                                        </div>
+                                        <div class="ad-metric">
+                                            <span class="ad-metric-label">Leads:</span>
+                                            <span class="ad-metric-value">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="ad-account-total glass">
+                                <div class="ad-total-label">Total Spends on Meta Ads (All Campaigns Combined)</div>
+                                <div class="ad-total-value" id="totalMetaSpend">₹0.00</div>
+                                <div class="ad-total-sub">April to December 2025</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Dashboard Grid -->
+                    <div class="dashboard-grid">
+                        <div class="card glass">
+                            <h3 class="card-title"><i class="fas fa-chart-pie"></i> Platform Distribution</h3>
+                            <div class="platform-badges">
+                                <div class="platform-badge google-badge">
+                                    <i class="fab fa-google"></i> Google: <span id="googleTotal">₹0</span>
+                                </div>
+                                <div class="platform-badge meta-badge">
+                                    <i class="fab fa-facebook"></i> Meta: <span id="metaTotal">₹0</span>
+                                </div>
+                            </div>
+                            <canvas id="platformChart" height="150"></canvas>
+                        </div>
+
+                        <div class="card glass">
+                            <h3 class="card-title"><i class="fas fa-graduation-cap"></i> Course-wise Budget</h3>
+                            <div id="courseBudgetList" class="course-budget-list">
+                                <div class="course-item">
+                                    <span class="course-name">Loading...</span>
+                                    <span class="course-amount">₹0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Keep this existing toggle on Dashboard -->
+                    <div class="campaign-toggle-bar">
+                        <button class="btn btn-primary" id="toggleCampaignDetailsBtn">
+                            <i class="fas fa-list"></i> View Campaign Details (Inline)
+                        </button>
+                        <span style="color: var(--text-muted); font-size: 0.9rem;">
+                            Shows/hides the inline campaign table below.
+                        </span>
+                    </div>
+
+                    <!-- Inline Campaign Details (hidden by default) -->
+                    <div class="table-container glass campaign-table-hidden" id="campaignDetailsSection">
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin: 15px; flex-wrap: wrap;">
+                            <h3 class="card-title" style="margin: 0;"><i class="fas fa-list-alt"></i> Campaign Details (Inline)</h3>
+
+                            <button class="btn btn-outline" id="hideCampaignDetailsBtn">
+                                <i class="fas fa-eye-slash"></i> Hide
+                            </button>
+                        </div>
+
+                        <div class="platform-filter" id="platformFilter">
+                            <button class="filter-btn active" data-platform="all">All Platforms</button>
+                            <button class="filter-btn" data-platform="Google">Google Ads Only</button>
+                            <button class="filter-btn" data-platform="Meta">Meta Ads Only</button>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Campaign Name</th>
+                                    <th>Ad Group/Ad Set</th>
+                                    <th>Platform</th>
+                                    <th>Ad Account</th>
+                                    <th>Course</th>
+                                    <th>Budget (₹)</th>
+                                    <th>Leads</th>
+                                    <th>Cost/Lead (₹)</th>
+                                    <th>Month</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaignDetails">
+                                <tr>
+                                    <td colspan="9" style="text-align:center; padding: 20px;">No campaign data loaded</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <footer>
+                        <p><i class="fas fa-sync-alt"></i> AAFM India Marketing Budget Dashboard • Data updates when sheet is refreshed</p>
+                        <p style="margin-top: 5px; font-size: 0.8rem;" id="lastUpdated">Last updated: Not connected</p>
+                    </footer>
+                </section>
+
+             <!-- COURSE-WISE BUDGET PAGE -->
+<section class="page" id="courseWisePage">
+  <div class="integration-hero glass">
+    <h2><i class="fas fa-graduation-cap"></i> Course-Wise Budget</h2>
+    <p>Detailed course-wise budget spent (based on currently selected filters: Month + Platform + Department + Head of Department).</p>
+  </div>
+
+  <div class="table-container glass">
+    <h3 class="card-title course-breakdown-title">
+      <i class="fas fa-table"></i> Course Breakdown
+    </h3>
+
+    <!-- Department + HOD filters -->
+    <div class="course-filters">
+      <div class="filter-group">
+        <label for="departmentSelect"><i class="fas fa-building"></i> Department Filter</label>
+        <select id="departmentSelect">
+          <option value="all">All Departments</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="hodSelect"><i class="fas fa-user-tie"></i> Head of Department Filter</label>
+        <select id="hodSelect">
+          <option value="all">All Heads of Department</option>
+        </select>
+      </div>
+
+      <div class="filter-group" style="min-width:180px;">
+        <label>&nbsp;</label>
+        <button class="btn btn-outline" id="resetDeptHodBtn" type="button">
+          <i class="fas fa-rotate-left"></i> Reset
+        </button>
+      </div>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Course</th>
+          <th>Department</th>
+          <th>Head of Department</th>
+          <th>Total Budget (₹)</th>
+          <th>Total Leads</th>
+          <th>Avg Cost/Lead (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="courseWiseTableBody">
+        <tr><td colspan="6" style="text-align:center; padding: 20px;">No course data loaded</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+                <!-- CAMPAIGN DETAILS PAGE -->
+                <section class="page" id="campaignDetailsPage">
+                    <div class="integration-hero glass">
+                        <h2><i class="fas fa-list-alt"></i> Campaign Details</h2>
+                        <p>Full campaign list (based on currently selected filters: Month + Platform + Department + Head of Department).</p>
+                    </div>
+
+                    <div class="table-container glass">
+                        <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin: 15px; flex-wrap: wrap;">
+                            <h3 class="card-title" style="margin: 0;"><i class="fas fa-list-alt"></i> Campaign List</h3>
+                        </div>
+
+                        <div class="platform-filter">
+                            <button class="filter-btn active" data-platform="all">All Platforms</button>
+                            <button class="filter-btn" data-platform="Google">Google Ads Only</button>
+                            <button class="filter-btn" data-platform="Meta">Meta Ads Only</button>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Campaign Name</th>
+                                    <th>Ad Group/Ad Set</th>
+                                    <th>Platform</th>
+                                    <th>Ad Account</th>
+                                    <th>Course</th>
+                                    <th>Department</th>
+                                    <th>Head of Department</th>
+                                    <th>Budget (₹)</th>
+                                    <th>Leads</th>
+                                    <th>Cost/Lead (₹)</th>
+                                    <th>Month</th>
+                                </tr>
+                            </thead>
+                            <tbody id="campaignDetailsPageBody">
+                                <tr><td colspan="11" style="text-align:center; padding: 20px;">No campaign data loaded</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- MONTHLY SUMMARY PAGE -->
+                <section class="page" id="monthlySummaryPage">
+                    <div class="integration-hero glass">
+                        <h2><i class="fas fa-calendar-alt"></i> Monthly Summary</h2>
+                        <p>Month-wise totals (based on currently selected filters: Platform + Department + Head of Department; month button still filters down if selected).</p>
+                    </div>
+
+                    <div class="table-container glass">
+                        <h3 class="card-title" style="margin: 15px;"><i class="fas fa-calendar-alt"></i> Monthly Summary</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Month</th>
+                                    <th>Google Budget</th>
+                                    <th>Meta Budget</th>
+                                    <th>Total Budget</th>
+                                    <th>Total Leads</th>
+                                    <th>Avg Cost/Lead</th>
+                                </tr>
+                            </thead>
+                            <tbody id="monthlySummaryPageBody"></tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- INTEGRATIONS PAGE -->
+                <section class="page" id="integrationsPage">
+                    <div class="integration-hero glass">
+                        <h2><i class="fas fa-plug"></i> Integrations</h2>
+                        <p>Connect external data sources to keep this dashboard fresh and automated.</p>
+
+                        <div style="margin-top: 14px;">
+                            <h3 style="font-size:1.05rem; margin-bottom:8px; display:flex; gap:10px; align-items:center;">
+                                <i class="fab fa-google" style="color: rgba(147,197,253,0.95)"></i> Google Sheets Integration
+                            </h3>
+
+                            <p style="font-size:0.92rem; color: var(--text-secondary);">
+                                Google Sheet is configured in code. Use the button below to refresh data.
+                            </p>
+
+                            <div class="sheet-input">
+                                <button id="loadSheetBtn" class="btn btn-success">
+                                    <i class="fas fa-cloud-download-alt"></i> Refresh Data
+                                </button>
+                            </div>
+
+                            <p style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
+                                <i class="fas fa-info-circle"></i> If you change the Sheet, update
+                                <b>GOOGLE_SHEET_CSV_URL</b> in the script.
+                            </p>
+
+                            <div class="loading" id="loading">
+                                <i class="fas fa-spinner"></i> Loading data from Google Sheets...
+                            </div>
+
+                            <div class="card glass" style="margin-top:16px;">
+                                <h3 class="card-title"><i class="fas fa-table-columns"></i> Sheet Columns Required (for new filters)</h3>
+                                <p style="color: var(--text-secondary); line-height: 1.5;">
+                                    Add these exact columns in your Google Sheet header row:
+                                    <b>Department</b> and <b>Head of Department</b>.
+                                    <br /><br />
+                                    Example placement:
+                                    <span style="color: rgba(147,197,253,0.95); font-weight:700;">
+                                        Course | Department | Head of Department | Budget | Leads | Month | Platform | ...
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card glass">
+                        <h3 class="card-title"><i class="fas fa-shield-halved"></i> Profile Photo</h3>
+                        <p style="color: var(--text-secondary); line-height: 1.4;">
+                            Set your profile photo from code (no lockscreen upload). You can edit the value of
+                            <span style="color: rgba(147,197,253,0.95); font-weight:700;">DEFAULT_AVATAR_DATA_URL</span>
+                            in the script, or click the pencil button in the sidebar to set it once (stored in-memory for this session).
+                        </p>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // =============================================
+        // SETTINGS YOU CAN EDIT IN CODE
+        // =============================================
+        const DEFAULT_AVATAR_DATA_URL = "assets/logo.jpg";
+        const CORRECT_PASSWORD = "AAFM@2025";
+
+        // ✅ SINGLE PLACE: Put your Google Sheet CSV URL here (only once)
+        const GOOGLE_SHEET_CSV_URL =
+            "https://docs.google.com/spreadsheets/d/e/2PACX-1vR38TZfd5P1l7-S3BoKw2dBWZoRyv0wmPxkqvUYhOPm_QhPJEmizK88xzwFZU9NamxVavNOmcaiq-CK/pub?output=csv";
+
+        // =============================================
+        // THEME (DARK/LIGHT) TOGGLE
+        // =============================================
+        const THEME_KEY = "aafm_dashboard_theme";
+
+        function getTheme() {
+            return localStorage.getItem(THEME_KEY) || "dark";
+        }
+
+        function setTheme(theme) {
+            const t = theme === "light" ? "light" : "dark";
+            document.body.setAttribute("data-theme", t);
+            localStorage.setItem(THEME_KEY, t);
+            syncThemeUI(t);
+            applyAllFiltersAndRender();
+        }
+
+        function syncThemeUI(theme) {
+            const sw = document.getElementById("themeSwitch");
+            const icon = document.getElementById("themeIcon");
+            const text = document.getElementById("themeText");
+            if (!sw || !icon || !text) return;
+
+            const isDark = theme !== "light";
+            sw.setAttribute("data-on", isDark ? "1" : "0");
+            sw.setAttribute("aria-checked", isDark ? "true" : "false");
+            icon.className = isDark ? "fas fa-moon" : "fas fa-sun";
+            text.textContent = isDark ? "Dark Mode" : "Light Mode";
+        }
+
+        function toggleTheme() {
+            const current = document.body.getAttribute("data-theme") || "dark";
+            setTheme(current === "dark" ? "light" : "dark");
+        }
+
+        // =============================================
+        // LOGIN SYSTEM
+        // =============================================
+        const loginScreen = document.getElementById('loginScreen');
+        const appShell = document.getElementById('appShell');
+        const passwordInput = document.getElementById('passwordInput');
+        const passwordToggle = document.getElementById('passwordToggle');
+        const loginButton = document.getElementById('loginButton');
+        const loginError = document.getElementById('loginError');
+
+        const avatarPlaceholder = document.getElementById('avatarPlaceholder');
+        const avatarImage = document.getElementById('avatarImage');
+        const avatarImageSmall = document.getElementById('avatarImageSmall');
+        const editAvatarBtn = document.getElementById('editAvatarBtn');
+        const logoutButton = document.getElementById('logoutButton');
+
+        let userAvatar = DEFAULT_AVATAR_DATA_URL;
+
+        function applyAvatar(src) {
+            userAvatar = src;
+
+            if (src) {
+                avatarPlaceholder.style.display = 'none';
+                avatarImage.src = src;
+                avatarImage.style.display = 'block';
+                avatarImageSmall.src = src;
+            } else {
+                avatarPlaceholder.style.display = 'flex';
+                avatarImage.style.display = 'none';
+                avatarImageSmall.src = DEFAULT_AVATAR_DATA_URL;
+            }
+        }
+        applyAvatar(userAvatar);
+
+        passwordToggle.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.innerHTML = type === 'password'
+                ? '<i class="fas fa-eye"></i>'
+                : '<i class="fas fa-eye-slash"></i>';
+        });
+
+        loginButton.addEventListener('click', handleLogin);
+        passwordInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') handleLogin();
+        });
+
+        function handleLogin() {
+            const password = passwordInput.value.trim();
+
+            if (password === CORRECT_PASSWORD) {
+                loginError.style.display = 'none';
+                passwordInput.value = '';
+
+                loginScreen.classList.add('hidden');
+
+                setTimeout(() => {
+                    appShell.classList.add('visible');
+                    avatarImageSmall.src = userAvatar || DEFAULT_AVATAR_DATA_URL;
+
+                    setTheme(getTheme());
+
+                    initializeWithSampleData();
+                    loadDataFromSheet(GOOGLE_SHEET_CSV_URL);
+                    setupPlatformFilter();
+                    setupSidebarNavigation();
+                    setupCampaignDetailsToggle();
+                    setupThemeToggle();
+                    setupDeptHodUI(); // NEW
+                }, 260);
+            } else {
+                loginError.style.display = 'block';
+                passwordInput.value = '';
+                passwordInput.focus();
+
+                passwordInput.classList.add('error-shake');
+                setTimeout(() => passwordInput.classList.remove('error-shake'), 500);
+            }
+        }
+
+        logoutButton.addEventListener('click', function() {
+            appShell.classList.remove('visible');
+            setTimeout(() => {
+                loginScreen.classList.remove('hidden');
+                passwordInput.focus();
+            }, 260);
+        });
+
+        editAvatarBtn.addEventListener('click', function() {
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'image/*';
+
+            fileInput.addEventListener('change', function(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    applyAvatar(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            });
+
+            fileInput.click();
+        });
+
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            .error-shake {
+                animation: shake 0.5s ease-in-out;
+                border-color: rgba(239, 68, 68, 0.8) !important;
+            }
+        `;
+        document.head.appendChild(style);
+
+        function setupSidebarNavigation() {
+            const navButtons = document.querySelectorAll('.nav button');
+            const pages = document.querySelectorAll('.page');
+
+            navButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    navButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+
+                    const pageId = btn.getAttribute('data-page');
+                    pages.forEach(p => p.classList.remove('active'));
+                    const pageEl = document.getElementById(pageId);
+                    if (pageEl) pageEl.classList.add('active');
+
+                    applyAllFiltersAndRender();
+                });
+            });
+        }
+
+        function setupThemeToggle() {
+            const sw = document.getElementById("themeSwitch");
+            if (!sw) return;
+
+            sw.addEventListener("click", toggleTheme);
+            sw.addEventListener("keydown", (e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    toggleTheme();
+                }
+            });
+
+            syncThemeUI(getTheme());
+        }
+
+        // =============================================
+        // Campaign Details Toggle (Dashboard inline button)
+        // =============================================
+        function setupCampaignDetailsToggle() {
+            const toggleBtn = document.getElementById('toggleCampaignDetailsBtn');
+            const hideBtn = document.getElementById('hideCampaignDetailsBtn');
+            const section = document.getElementById('campaignDetailsSection');
+
+            if (!toggleBtn || !section) return;
+
+            const show = () => {
+                section.classList.remove('campaign-table-hidden');
+                toggleBtn.innerHTML = '<i class="fas fa-eye-slash"></i> Hide Campaign Details (Inline)';
+                toggleBtn.classList.remove('btn-primary');
+                toggleBtn.classList.add('btn-outline');
+                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            };
+
+            const hide = () => {
+                section.classList.add('campaign-table-hidden');
+                toggleBtn.innerHTML = '<i class="fas fa-list"></i> View Campaign Details (Inline)';
+                toggleBtn.classList.remove('btn-outline');
+                toggleBtn.classList.add('btn-primary');
+            };
+
+            toggleBtn.addEventListener('click', () => {
+                const isHidden = section.classList.contains('campaign-table-hidden');
+                if (isHidden) show();
+                else hide();
+            });
+
+            if (hideBtn) hideBtn.addEventListener('click', hide);
+            hide();
+        }
+
+        // =============================================
+        // DEPARTMENT + HOD FILTER UI (NEW)
+        // =============================================
+        function setupDeptHodUI() {
+            const deptSel = document.getElementById('departmentSelect');
+            const hodSel = document.getElementById('hodSelect');
+            const resetBtn = document.getElementById('resetDeptHodBtn');
+
+            if (deptSel) {
+                deptSel.addEventListener('change', () => applyAllFiltersAndRender());
+            }
+            if (hodSel) {
+                hodSel.addEventListener('change', () => applyAllFiltersAndRender());
+            }
+            if (resetBtn) {
+                resetBtn.addEventListener('click', () => {
+                    if (deptSel) deptSel.value = 'all';
+                    if (hodSel) hodSel.value = 'all';
+                    applyAllFiltersAndRender();
+                });
+            }
+        }
+
+        function populateDeptHodFiltersFromData(data) {
+            const deptSel = document.getElementById('departmentSelect');
+            const hodSel = document.getElementById('hodSelect');
+            if (!deptSel || !hodSel) return;
+
+            const currentDept = deptSel.value || 'all';
+            const currentHod = hodSel.value || 'all';
+
+            const departments = Array.from(new Set(
+                (data || []).map(r => (r.department || '').toString().trim()).filter(Boolean)
+            )).sort((a,b) => a.localeCompare(b));
+
+            const hods = Array.from(new Set(
+                (data || []).map(r => (r.headofdepartment || '').toString().trim()).filter(Boolean)
+            )).sort((a,b) => a.localeCompare(b));
+
+            // rebuild options
+            deptSel.innerHTML = `<option value="all">All Departments</option>` + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
+            hodSel.innerHTML = `<option value="all">All Heads of Department</option>` + hods.map(h => `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join('');
+
+            // restore selection if still available
+            deptSel.value = departments.includes(currentDept) ? currentDept : 'all';
+            hodSel.value = hods.includes(currentHod) ? currentHod : 'all';
+        }
+
+        function escapeHtml(str) {
+            return String(str)
+                .replaceAll('&','&amp;')
+                .replaceAll('<','&lt;')
+                .replaceAll('>','&gt;')
+                .replaceAll('"','&quot;')
+                .replaceAll("'","&#039;");
+        }
+
+        // =============================================
+        // DASHBOARD FUNCTIONALITY
+        // =============================================
+        let campaignData = [];
+
+        // Google (existing multi-account demo object)
+        let adAccountData = {
+            "AAFM India": { id: "876-829-1265", budget: 462691.98, cpc: 491, campaigns: [] },
+            "CFP Course": { id: "950-140-0029", budget: 146288.83, cpc: 54.29, campaigns: [] },
+            "NexGen Estate Planning": { id: "687-508-0974", budget: 36846.18, cpc: 31.02, campaigns: [] },
+            "AAPM India": { id: "116-083-2064", budget: 150889.82, cpc: 31.02, campaigns: [] }
+        };
+
+        // NEW: Meta (single account)
+        let metaAccountData = {
+            name: "Meta Ads",
+            id: "META-ACCOUNT",
+            cpc: 0,
+            budget: 0,
+            leads: 0,
+            campaigns: 0
+        };
+
+        let platformChartInstance;
+
+        function formatCurrency(amount) {
+            if (!amount) return '₹0';
+            if (amount >= 10000000) return '₹' + (amount/10000000).toFixed(1) + 'Cr';
+            if (amount >= 100000) return '₹' + (amount/100000).toFixed(1) + 'L';
+            if (amount >= 1000) return '₹' + (amount/1000).toFixed(0) + 'K';
+            return '₹' + Math.round(amount);
+        }
+        function formatCurrencyFull(amount) {
+            if (!amount) return '₹0';
+            return '₹' + amount.toLocaleString('en-IN');
+        }
+        function formatCurrencyDecimal(amount) {
+            if (!amount) return '₹0.00';
+            return '₹' + Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+function parseCSV(csvText) {
+    const rows = [];
+    const lines = csvText.replace(/\r/g, '').split('\n').filter(Boolean);
+
+    function parseLine(line) {
+        const result = [];
+        let cur = '';
+        let inQuotes = false;
+
+        for (let i = 0; i < line.length; i++) {
+            const ch = line[i];
+            const next = line[i + 1];
+
+            if (ch === '"' && inQuotes && next === '"') {
+                cur += '"';
+                i++;
+                continue;
+            }
+            if (ch === '"') {
+                inQuotes = !inQuotes;
+                continue;
+            }
+            if (ch === ',' && !inQuotes) {
+                result.push(cur);
+                cur = '';
+                continue;
+            }
+            cur += ch;
+        }
+        result.push(cur);
+        return result.map(v => v.trim());
+    }
+
+    // Normalizes header keys like:
+    // "Head of Department" -> "headofdepartment"
+    // "Head_Of_Department" -> "headofdepartment"
+    // "HOD" -> "hod"
+    function normKey(k) {
+        return String(k || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]/g, ''); // remove spaces, underscores, hyphens, etc.
+    }
+
+    const rawHeaders = parseLine(lines[0]);
+    const headers = rawHeaders.map(h => normKey(h));
+
+    // Helper to read a value by multiple possible header keys
+    function getByKeys(obj, keys) {
+        for (const k of keys) {
+            if (obj[k] !== undefined && obj[k] !== '') return obj[k];
+        }
+        return '';
+    }
+
+    for (let i = 1; i < lines.length; i++) {
+        const values = parseLine(lines[i]);
+        if (values.length < headers.length) continue;
+
+        const row = {};
+        headers.forEach((header, idx) => {
+            let value = values[idx] ?? '';
+
+            // numeric normalization
+            if (
+                header.includes('budget') ||
+                header.includes('cost') ||
+                header.includes('lead') ||
+                header.includes('cpc') ||
+                header.includes('click') ||
+                header.includes('impression')
+            ) {
+                const num = parseFloat(String(value).replace(/[^\d.-]/g, ''));
+                value = isNaN(num) ? value : num;
+            }
+
+            row[header] = value;
+        });
+
+        // Standardized fields
+        row.campaignname = getByKeys(row, ['campaignname', 'campaign', 'name']);
+        row.platform = getByKeys(row, ['platform', 'channel', 'source']);
+        row.adaccount = getByKeys(row, ['adaccount', 'account', 'adaccountname', 'adaccountid', 'ad_account']);
+        row.adgroup = getByKeys(row, ['adgroup', 'adgroupname', 'ad_group']);
+        row.adset = getByKeys(row, ['adset', 'adsetname', 'ad_set']);
+        row.course = getByKeys(row, ['course', 'program']);
+        row.month = getByKeys(row, ['month', 'period']);
+
+        // ✅ Department
+        row.department = getByKeys(row, ['department', 'dept', 'departmentname']);
+
+        // ✅ Head of Department (very forgiving)
+        row.headofdepartment = getByKeys(row, [
+            'headofdepartment',
+            'headofdept',
+            'headdepartment',
+            'headdept',
+            'hod',
+            'departmenthead',
+            'depthead',
+            'head'
+        ]);
+
+        // Budget / Leads (safe)
+        row.budget = Number(getByKeys(row, ['budget', 'spend', 'amount'])) || 0;
+        row.leads = Number(getByKeys(row, ['leads', 'lead'])) || 0;
+
+        if (row.campaignname && (row.budget !== undefined)) rows.push(row);
+    }
+
+    return rows;
+}
+
+        const MONTH_ORDER = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+        function createMonthSelector(months) {
+            const monthSelector = document.getElementById('monthSelector');
+
+            const allBtn = monthSelector.querySelector('[data-month="all"]');
+            if (allBtn && !allBtn.dataset.bound) {
+                allBtn.dataset.bound = "1";
+                allBtn.addEventListener('click', function () {
+                    document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    applyAllFiltersAndRender();
+                });
+            }
+
+            while (monthSelector.children.length > 1) monthSelector.removeChild(monthSelector.lastChild);
+
+            months.forEach(month => {
+                const button = document.createElement('button');
+                button.className = 'month-btn';
+                button.textContent = month;
+                button.setAttribute('data-month', month);
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.month-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    applyAllFiltersAndRender();
+                });
+                monthSelector.appendChild(button);
+            });
+        }
+
+        function computeAggregates(campaigns) {
+            const agg = {
+                totalBudget: 0,
+                totalLeads: 0,
+                totalCampaigns: campaigns.length,
+                platform: { Google: 0, Meta: 0 },
+                courses: {},
+                months: {}
+            };
+
+            function mergeLabel(existing, incoming) {
+                const a = (existing || '').toString().trim();
+                const b = (incoming || '').toString().trim();
+                if (!a || a === '—') return b || '—';
+                if (!b || b === '—') return a || '—';
+                if (a === b) return a;
+                return 'Multiple';
+            }
+
+            campaigns.forEach(c => {
+                const budget = Number(c.budget || 0);
+                const leads = Number(c.leads || 0);
+                const platform = (c.platform || 'Unknown').toString().toLowerCase();
+                const course = (c.course || 'Uncategorized').toString();
+                const month = (c.month || 'Unknown').toString();
+
+                const dept = (c.department || '—').toString().trim() || '—';
+                const hod = (c.headofdepartment || '—').toString().trim() || '—';
+
+                agg.totalBudget += budget;
+                agg.totalLeads += leads;
+
+                if (platform.includes('google')) agg.platform.Google += budget;
+                else if (platform.includes('meta') || platform.includes('facebook')) agg.platform.Meta += budget;
+
+                if (!agg.courses[course]) agg.courses[course] = { budget: 0, leads: 0, department: dept, hod: hod };
+                agg.courses[course].budget += budget;
+                agg.courses[course].leads += leads;
+                agg.courses[course].department = mergeLabel(agg.courses[course].department, dept);
+                agg.courses[course].hod = mergeLabel(agg.courses[course].hod, hod);
+
+                if (!agg.months[month]) agg.months[month] = { month, google: 0, meta: 0, total: 0, leads: 0 };
+                if (platform.includes('google')) agg.months[month].google += budget;
+                else if (platform.includes('meta') || platform.includes('facebook')) agg.months[month].meta += budget;
+                agg.months[month].total += budget;
+                agg.months[month].leads += leads;
+            });
+
+            agg.avgCost = agg.totalLeads > 0 ? agg.totalBudget / agg.totalLeads : 0;
+
+            agg.monthly = Object.values(agg.months).map(m => ({
+                ...m,
+                costPerLead: m.leads > 0 ? m.total / m.leads : 0
+            })).sort((a, b) => MONTH_ORDER.indexOf(a.month) - MONTH_ORDER.indexOf(b.month));
+
+            return agg;
+        }
+
+        function setupPlatformFilter() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    applyAllFiltersAndRender();
+                });
+            });
+        }
+
+        function getActiveMonth() {
+            const active = document.querySelector('.month-btn.active');
+            return active ? active.getAttribute('data-month') : 'all';
+        }
+
+        function getActivePlatform() {
+            const active = document.querySelector('.filter-btn.active');
+            return active ? active.getAttribute('data-platform') : 'all';
+        }
+
+        function getActiveDepartment() {
+            const deptSel = document.getElementById('departmentSelect');
+            return deptSel ? (deptSel.value || 'all') : 'all';
+        }
+
+        function getActiveHod() {
+            const hodSel = document.getElementById('hodSelect');
+            return hodSel ? (hodSel.value || 'all') : 'all';
+        }
+
+        function applyAllFiltersAndRender() {
+            const activeMonth = getActiveMonth();
+            const activePlatform = getActivePlatform();
+            const activeDept = getActiveDepartment();
+            const activeHod = getActiveHod();
+
+            let filtered = campaignData.slice();
+
+            if (activeMonth !== 'all') {
+                filtered = filtered.filter(c => (c.month || '').toString() === activeMonth);
+            }
+
+            if (activePlatform !== 'all') {
+                const p = activePlatform.toLowerCase();
+                filtered = filtered.filter(c => (c.platform || '').toString().toLowerCase().includes(p));
+            }
+
+            if (activeDept !== 'all') {
+                filtered = filtered.filter(c => (c.department || '').toString() === activeDept);
+            }
+
+            if (activeHod !== 'all') {
+                filtered = filtered.filter(c => (c.headofdepartment || '').toString() === activeHod);
+            }
+
+            updateDashboard(filtered);
+        }
+
+        function updateAdAccountReport() {
+            const container = document.getElementById('adAccountGrid');
+            const totalSpendElement = document.getElementById('totalGoogleSpend');
+
+            container.innerHTML = '';
+            let totalGoogleSpend = 0;
+
+            Object.keys(adAccountData).forEach(accountName => {
+                const account = adAccountData[accountName];
+                account.campaigns = [];
+
+                // Only Google campaigns for this account bucket
+                const accountCampaigns = campaignData.filter(c => {
+                    const plat = (c.platform || '').toString().toLowerCase();
+                    const isGoogle = plat.includes('google');
+                    const matchAccount = (c.adaccount || '').toString().toLowerCase().includes(accountName.toLowerCase());
+                    return isGoogle && matchAccount;
+                });
+
+                let accountBudget = 0;
+                let accountLeads = 0;
+
+                accountCampaigns.forEach(c => {
+                    accountBudget += c.budget || 0;
+                    accountLeads += c.leads || 0;
+                    account.campaigns.push(c);
+                });
+
+                const budget = accountCampaigns.length > 0 ? accountBudget : account.budget;
+                const cpc = account.cpc;
+                totalGoogleSpend += budget;
+
+                const card = document.createElement('div');
+                card.className = 'ad-account-card glass';
+                card.innerHTML = `
+                    <div class="ad-account-id">${account.id}</div>
+                    <div class="ad-account-name">${accountName}</div>
+                    <div class="ad-account-metrics">
+                        <div class="ad-metric">
+                            <span class="ad-metric-label">Budget Spent:</span>
+                            <span class="ad-metric-value">${formatCurrencyDecimal(budget)}</span>
+                        </div>
+                        <div class="ad-metric">
+                            <span class="ad-metric-label">Avg CPC:</span>
+                            <span class="ad-metric-value">${formatCurrencyDecimal(cpc)}</span>
+                        </div>
+                        ${accountCampaigns.length > 0 ? `
+                        <div class="ad-metric">
+                            <span class="ad-metric-label">Campaigns:</span>
+                            <span class="ad-metric-value">${accountCampaigns.length}</span>
+                        </div>
+                        <div class="ad-metric">
+                            <span class="ad-metric-label">Leads:</span>
+                            <span class="ad-metric-value">${accountLeads}</span>
+                        </div>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            totalSpendElement.textContent = formatCurrencyDecimal(totalGoogleSpend);
+        }
+
+        // NEW: Meta single-account report (linked to sheet)
+        function updateMetaAdAccountReport() {
+            const grid = document.getElementById('metaAdAccountGrid');
+            const totalEl = document.getElementById('totalMetaSpend');
+            if (!grid || !totalEl) return;
+
+            const metaCampaigns = campaignData.filter(c => {
+                const plat = (c.platform || '').toString().toLowerCase();
+                return plat.includes('meta') || plat.includes('facebook');
+            });
+
+            let budget = 0;
+            let leads = 0;
+            let cpc = 0; // if your sheet has CPC column (cpc) per row, we can compute weighted/avg; else 0
+
+            metaCampaigns.forEach(c => {
+                budget += Number(c.budget || 0);
+                leads += Number(c.leads || 0);
+                // if your sheet has a "cpc" column per row, you can compute avg:
+                // cpc += Number(c.cpc || 0);
+            });
+
+            // Avg CPC fallback: if you later add clicks, compute properly; keeping safe:
+            const avgCpc = metaCampaigns.length ? (cpc / metaCampaigns.length) : 0;
+
+            metaAccountData.budget = budget;
+            metaAccountData.leads = leads;
+            metaAccountData.cpc = avgCpc;
+            metaAccountData.campaigns = metaCampaigns.length;
+
+            grid.innerHTML = `
+                <div class="ad-account-card glass">
+                    <div class="ad-account-id">${metaAccountData.id}</div>
+                    <div class="ad-account-name">${metaAccountData.name}</div>
+                    <div class="ad-account-metrics">
+                        <div class="ad-metric">
+                            <span class="ad-metric-label">Budget Spent:</span>
+                            <span class="ad-metric-value">${formatCurrencyDecimal(metaAccountData.budget)}</span>
+                        </div>
+                        <div class="ad-metric">
+                            <span class="ad-metric-label">Avg CPC:</span>
+                            <span class="ad-metric-value">${formatCurrencyDecimal(metaAccountData.cpc)}</span>
+                        </div>
+                        <div class="ad-metric">
+                            <span class="ad-metric-label">Campaigns:</span>
+                            <span class="ad-metric-value">${metaAccountData.campaigns}</span>
+                        </div>
+                        <div class="ad-metric">
+                            <span class="ad-metric-label">Leads:</span>
+                            <span class="ad-metric-value">${metaAccountData.leads}</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            totalEl.textContent = formatCurrencyDecimal(metaAccountData.budget);
+        }
+
+        function processCampaignData(data) {
+            campaignData = data;
+
+            const monthsSet = new Set();
+            data.forEach(c => monthsSet.add((c.month || 'Unknown').toString()));
+            const monthsSorted = Array.from(monthsSet).sort((a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b));
+            createMonthSelector(monthsSorted);
+
+            // NEW: populate Department + HOD dropdowns from sheet data
+            populateDeptHodFiltersFromData(data);
+
+            updateAdAccountReport();
+            updateMetaAdAccountReport(); // NEW
+            applyAllFiltersAndRender();
+        }
+
+        function updateDashboard(campaigns) {
+            const agg = computeAggregates(campaigns);
+            updateKPIsFromAgg(agg);
+            updateCourseBudgetFromAgg(agg);
+            updateCampaignDetails(campaigns);          // dashboard inline table
+            updateCampaignDetailsPage(campaigns);      // Campaign Details tab
+            updateCourseWiseTableFromAgg(agg);         // Course-Wise tab
+            updateMonthlySummaryPageFromAgg(agg);      // Monthly Summary tab
+            updateChartsFromAgg(agg);
+        }
+
+        function updateKPIsFromAgg(agg) {
+            document.getElementById('totalBudget').textContent = formatCurrencyDecimal(agg.totalBudget);
+            document.getElementById('totalLeads').textContent = agg.totalLeads.toLocaleString('en-IN');
+            document.getElementById('avgCost').textContent = formatCurrencyDecimal(agg.avgCost);
+            document.getElementById('totalCampaigns').textContent = agg.totalCampaigns;
+
+            document.getElementById('googleTotal').textContent = formatCurrencyDecimal(agg.platform.Google);
+            document.getElementById('metaTotal').textContent = formatCurrencyDecimal(agg.platform.Meta);
+        }
+
+        function updateCourseBudgetFromAgg(agg) {
+            const container = document.getElementById('courseBudgetList');
+            container.innerHTML = '';
+
+            const sortedCourses = Object.entries(agg.courses).sort((a, b) => b[1].budget - a[1].budget);
+
+            if (sortedCourses.length === 0) {
+                container.innerHTML = '<div class="course-item"><span class="course-name">No course data</span><span class="course-amount">₹0</span></div>';
+                return;
+            }
+
+            sortedCourses.forEach(([course, data]) => {
+                const item = document.createElement('div');
+                item.className = 'course-item';
+                item.innerHTML = `
+                    <span class="course-name" title="${escapeHtml(course)}">${escapeHtml(course)}</span>
+                    <span class="course-amount">${formatCurrencyDecimal(data.budget)}</span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Course-Wise Tab table (UPDATED: Department + HOD columns)
+        function updateCourseWiseTableFromAgg(agg) {
+            const tbody = document.getElementById('courseWiseTableBody');
+            if (!tbody) return;
+
+            const sorted = Object.entries(agg.courses).sort((a, b) => b[1].budget - a[1].budget);
+
+            if (!sorted.length) {
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">No course data for selected filters.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = '';
+            sorted.forEach(([course, d]) => {
+                const cpl = d.leads > 0 ? (d.budget / d.leads) : 0;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${escapeHtml(course)}</strong></td>
+                    <td>${escapeHtml(d.department || '—')}</td>
+                    <td>${escapeHtml(d.hod || '—')}</td>
+                    <td class="data-highlight">${formatCurrencyFull(Math.round(d.budget))}</td>
+                    <td>${(d.leads || 0).toLocaleString('en-IN')}</td>
+                    <td>${formatCurrencyFull(Math.round(cpl))}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Dashboard inline campaign details
+        function updateCampaignDetails(campaigns) {
+            const container = document.getElementById('campaignDetails');
+
+            if (campaigns.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align:center; padding: 20px;">
+                            No campaign data available for the selected filter. Click “Refresh Data” in Integrations.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            campaigns.forEach(campaign => {
+                const row = document.createElement('tr');
+                const costPerLead = campaign.leads > 0 ? campaign.budget / campaign.leads : 0;
+
+                const p = (campaign.platform || '').toString().toLowerCase();
+                const platformColor =
+                    p.includes('google') ? getComputedStyle(document.body).getPropertyValue('--chart-google').trim() :
+                    (p.includes('meta') || p.includes('facebook')) ? getComputedStyle(document.body).getPropertyValue('--chart-meta').trim() :
+                    'rgba(248,250,252,0.65)';
+
+                row.innerHTML = `
+                    <td>${escapeHtml(campaign.campaignname || 'Unnamed')}</td>
+                    <td>${escapeHtml(campaign.adgroup || campaign.adset || '--')}</td>
+                    <td><span style="color:${platformColor}; font-weight: 700;">${escapeHtml(campaign.platform || 'Unknown')}</span></td>
+                    <td>${escapeHtml(campaign.adaccount || 'Unassigned')}</td>
+                    <td>${escapeHtml(campaign.course || 'Uncategorized')}</td>
+                    <td class="data-highlight">${formatCurrencyFull(Math.round(campaign.budget || 0))}</td>
+                    <td>${campaign.leads || 0}</td>
+                    <td>${formatCurrencyFull(Math.round(costPerLead))}</td>
+                    <td>${escapeHtml(campaign.month || '--')}</td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Campaign Details Tab (UPDATED: Department + HOD columns)
+        function updateCampaignDetailsPage(campaigns) {
+            const container = document.getElementById('campaignDetailsPageBody');
+            if (!container) return;
+
+            if (campaigns.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="11" style="text-align:center; padding: 20px;">
+                            No campaign data available for the selected filter. Click “Refresh Data” in Integrations.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            container.innerHTML = '';
+
+            campaigns.forEach(campaign => {
+                const row = document.createElement('tr');
+                const costPerLead = campaign.leads > 0 ? campaign.budget / campaign.leads : 0;
+
+                const p = (campaign.platform || '').toString().toLowerCase();
+                const platformColor =
+                    p.includes('google') ? getComputedStyle(document.body).getPropertyValue('--chart-google').trim() :
+                    (p.includes('meta') || p.includes('facebook')) ? getComputedStyle(document.body).getPropertyValue('--chart-meta').trim() :
+                    'rgba(248,250,252,0.65)';
+
+                row.innerHTML = `
+                    <td>${escapeHtml(campaign.campaignname || 'Unnamed')}</td>
+                    <td>${escapeHtml(campaign.adgroup || campaign.adset || '--')}</td>
+                    <td><span style="color:${platformColor}; font-weight: 700;">${escapeHtml(campaign.platform || 'Unknown')}</span></td>
+                    <td>${escapeHtml(campaign.adaccount || 'Unassigned')}</td>
+                    <td>${escapeHtml(campaign.course || 'Uncategorized')}</td>
+                    <td>${escapeHtml(campaign.department || '—')}</td>
+                    <td>${escapeHtml(campaign.headofdepartment || '—')}</td>
+                    <td class="data-highlight">${formatCurrencyFull(Math.round(campaign.budget || 0))}</td>
+                    <td>${campaign.leads || 0}</td>
+                    <td>${formatCurrencyFull(Math.round(costPerLead))}</td>
+                    <td>${escapeHtml(campaign.month || '--')}</td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Monthly Summary Tab
+        function updateMonthlySummaryPageFromAgg(agg) {
+            const container = document.getElementById('monthlySummaryPageBody');
+            if (!container) return;
+
+            container.innerHTML = '';
+
+            if (!agg.monthly.length) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding: 20px;">
+                            No monthly data for the selected filter.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            agg.monthly.forEach(month => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${escapeHtml(month.month)}</strong></td>
+                    <td>${formatCurrencyFull(Math.round(month.google))}</td>
+                    <td>${formatCurrencyFull(Math.round(month.meta))}</td>
+                    <td class="data-highlight">${formatCurrencyFull(Math.round(month.total))}</td>
+                    <td>${month.leads}</td>
+                    <td>${formatCurrencyFull(Math.round(month.costPerLead))}</td>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function updateChartsFromAgg(agg) {
+            if (platformChartInstance) platformChartInstance.destroy();
+
+            const platformCtx = document.getElementById('platformChart').getContext('2d');
+
+            const css = getComputedStyle(document.body);
+            const g = css.getPropertyValue('--chart-google').trim();
+            const m = css.getPropertyValue('--chart-meta').trim();
+            const labelColor = css.getPropertyValue('--text-secondary').trim();
+
+            platformChartInstance = new Chart(platformCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Google Ads', 'Meta Ads'],
+                    datasets: [{
+                        data: [agg.platform.Google, agg.platform.Meta],
+                        backgroundColor: [g, m],
+                        borderWidth: 2,
+                        borderColor: 'rgba(15, 23, 42, 0.45)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: labelColor, padding: 15 }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadDataFromSheet(url) {
+            try {
+                document.getElementById('loading').style.display = 'block';
+                const response = await fetch(url);
+                const csvText = await response.text();
+
+                const data = parseCSV(csvText);
+                processCampaignData(data);
+
+                const now = new Date();
+                document.getElementById('lastUpdated').textContent =
+                    `Last updated: ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+
+                return true;
+            } catch (error) {
+                console.error('Error loading data:', error);
+                alert('Error loading data from Google Sheets. Please check the URL in code (GOOGLE_SHEET_CSV_URL).');
+                return false;
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+
+        function initializeWithSampleData() {
+            const sampleData = [
+                { campaignname: "CWM Course Launch", adgroup: "CWM Display Ads", platform: "Google", adaccount: "AAFM India", course: "CWM", department: "Wealth", headofdepartment: "Mr. A", budget: 150000, leads: 120, month: "April" },
+                { campaignname: "Meta CWM Awareness", adset: "CWM Feed Ads", platform: "Meta", adaccount: "Meta Ads", course: "CWM", department: "Wealth", headofdepartment: "Mr. A", budget: 80000, leads: 95, month: "April" },
+                { campaignname: "CFA Level 1 Promo", adgroup: "CFA Search", platform: "Google", adaccount: "CFP Course", course: "CFA", department: "Investments", headofdepartment: "Ms. B", budget: 120000, leads: 85, month: "May" },
+                { campaignname: "FRM Course Facebook", adset: "FRM Carousel", platform: "Meta", adaccount: "Meta Ads", course: "FRM", department: "Risk", headofdepartment: "Mr. C", budget: 95000, leads: 110, month: "May" },
+                { campaignname: "Estate Planning Ads", adgroup: "Estate Search", platform: "Google", adaccount: "NexGen Estate Planning", course: "Estate Planning", department: "Estate", headofdepartment: "Mr. D", budget: 50000, leads: 75, month: "June" },
+                { campaignname: "AAPM Certification", adgroup: "AAPM Display", platform: "Google", adaccount: "AAPM India", course: "AAPM", department: "PM", headofdepartment: "Ms. E", budget: 90000, leads: 65, month: "June" }
+            ];
+
+            processCampaignData(sampleData);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            passwordInput.focus();
+            setTheme(getTheme());
+
+            const loadBtn = document.getElementById('loadSheetBtn');
+            if (loadBtn) {
+                loadBtn.addEventListener('click', async function() {
+                    const url = (GOOGLE_SHEET_CSV_URL || '').trim();
+
+                    if (!url) {
+                        alert('GOOGLE_SHEET_CSV_URL is empty. Please set it in the script.');
+                        return;
+                    }
+                    if (!url.includes('docs.google.com') || !url.includes('output=csv')) {
+                        alert('GOOGLE_SHEET_CSV_URL is not a valid Google Sheet CSV URL (must include output=csv).');
+                        return;
+                    }
+
+                    const success = await loadDataFromSheet(url);
+                    if (success) {
+                        const btn = this;
+                        btn.innerHTML = '<i class="fas fa-check"></i> Data Loaded';
+                        btn.classList.remove('btn-success');
+                        btn.classList.add('btn-primary');
+
+                        setTimeout(() => {
+                            btn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Refresh Data';
+                            btn.classList.remove('btn-primary');
+                            btn.classList.add('btn-success');
+                        }, 2000);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
