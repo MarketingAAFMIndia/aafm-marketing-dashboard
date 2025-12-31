@@ -2,17 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>AAFM India - Marketing Budget Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
+        /* =========================
+           MOBILE-FIRST BASE STYLES
+           ========================= */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* =========================
@@ -52,7 +56,6 @@
 
         /* =========================
            LIGHT THEME OVERRIDES
-           (applied when body[data-theme="light"])
            ========================= */
         body[data-theme="light"] {
             --bg-primary: #f6f7fb;
@@ -111,6 +114,9 @@
             -webkit-backdrop-filter: blur(18px) saturate(140%);
         }
 
+        /* =========================
+           MOBILE LOGIN SCREEN
+           ========================= */
         .login-screen {
             position: fixed;
             inset: 0;
@@ -127,38 +133,45 @@
                 radial-gradient(circle at 82% 70%, rgba(139, 92, 246, 0.18) 0%, transparent 45%),
                 linear-gradient(135deg, var(--modern-bg-1) 0%, var(--modern-bg-2) 50%, var(--modern-bg-3) 100%);
             backdrop-filter: blur(10px);
+            padding: 20px;
         }
 
-        .login-screen.hidden { opacity: 0; pointer-events: none; }
+        .login-screen.hidden { 
+            opacity: 0; 
+            pointer-events: none; 
+        }
 
         .login-container {
             border-radius: 22px;
-            padding: 42px 40px;
-            width: 92%;
+            padding: 30px 25px;
+            width: 100%;
             max-width: 440px;
             text-align: center;
         }
 
-        .login-header { margin-bottom: 30px; }
+        .login-header { margin-bottom: 20px; }
 
-        .company-logo { display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; }
+        .company-logo { display: flex; flex-direction: column; align-items: center; }
 
         .company-logo-circle {
-            width: 84px; height: 84px;
+            width: 70px;
+            height: 70px;
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
             border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
             border: 3px solid rgba(255, 255, 255, 0.20);
-            box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.35);
         }
-        .company-logo-circle i { font-size: 2.6rem; color: white; }
+        .company-logo-circle i { font-size: 2rem; color: white; }
 
-        .company-name { font-size: 1.85rem; font-weight: 750; color: white; letter-spacing: 0.4px; }
-        .company-tagline { font-size: 0.95rem; color: rgba(255, 255, 255, 0.72); margin-top: 6px; }
+        .company-name { font-size: 1.6rem; font-weight: 750; color: white; letter-spacing: 0.3px; }
+        .company-tagline { font-size: 0.85rem; color: rgba(255, 255, 255, 0.72); }
 
-        .user-avatar { margin: 18px 0 22px; }
-        .avatar-container { position: relative; width: 104px; height: 104px; margin: 0 auto 14px; }
+        .user-avatar { margin: 18px 0 20px; }
+        .avatar-container { position: relative; width: 90px; height: 90px; margin: 0 auto 12px; }
 
         .avatar-img {
             width: 100%; height: 100%;
@@ -174,21 +187,22 @@
             display: flex; align-items: center; justify-content: center;
             border: 3px solid rgba(255, 255, 255, 0.28);
         }
-        .avatar-placeholder i { font-size: 2.5rem; color: white; }
+        .avatar-placeholder i { font-size: 2.2rem; color: white; }
 
-        .username-display { font-size: 1.15rem; color: white; font-weight: 600; margin-bottom: 6px; }
-        .user-role { font-size: 0.9rem; color: rgba(255, 255, 255, 0.62); }
+        .username-display { font-size: 1.1rem; color: white; font-weight: 600; margin-bottom: 4px; }
+        .user-role { font-size: 0.85rem; color: rgba(255, 255, 255, 0.62); }
 
-        .password-input-container { position: relative; margin-bottom: 18px; }
+        .password-input-container { position: relative; margin-bottom: 16px; }
         .password-input {
             width: 100%;
-            padding: 15px 20px;
+            padding: 16px 20px;
             background: rgba(255, 255, 255, 0.08);
             border: 1px solid rgba(255, 255, 255, 0.14);
             border-radius: 12px;
             color: white;
             font-size: 1rem;
             transition: all 0.25s;
+            -webkit-appearance: none;
         }
 
         .password-input:focus {
@@ -207,12 +221,17 @@
             color: rgba(255, 255, 255, 0.55);
             cursor: pointer;
             transition: color 0.2s;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .password-toggle:hover { color: white; }
 
         .login-button {
             width: 100%;
-            padding: 14px 15px;
+            padding: 16px 15px;
             background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
             color: white;
             border: none;
@@ -222,12 +241,12 @@
             cursor: pointer;
             transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
             margin-bottom: 14px;
-            box-shadow: 0 14px 30px rgba(0,0,0,0.35);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.35);
         }
         .login-button:hover { transform: translateY(-2px); filter: brightness(1.03); }
         .login-button:active { transform: translateY(0); }
 
-        .login-footer { margin-top: 18px; font-size: 0.85rem; color: rgba(255, 255, 255, 0.52); }
+        .login-footer { margin-top: 16px; font-size: 0.85rem; color: rgba(255, 255, 255, 0.52); }
 
         .login-error {
             color: #fecaca;
@@ -236,28 +255,630 @@
             display: none;
         }
 
+        /* =========================
+           MOBILE APP SHELL
+           ========================= */
         .app-shell {
-            display: grid;
-            grid-template-columns: 270px 1fr;
+            display: block;
             min-height: 100vh;
             opacity: 0;
             transition: opacity 0.5s ease;
         }
         .app-shell.visible { opacity: 1; }
 
-        .sidebar {
-            position: sticky;
-            top: 0;
-            height: 100vh;
-            padding: 18px;
-            border-right: 1px solid rgba(255, 255, 255, 0.10);
+        /* Mobile Header */
+        .mobile-header {
             display: flex;
-            flex-direction: column;
-        }
-        body[data-theme="light"] .sidebar {
-            border-right: 1px solid rgba(15, 23, 42, 0.10);
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 999;
+            backdrop-filter: blur(10px);
         }
 
+        .mobile-header .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .mobile-header .brand .logo {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(139, 92, 246, 0.95) 100%);
+            border: 1px solid rgba(255,255,255,0.18);
+        }
+
+        .mobile-header .brand .logo i { color: #fff; }
+
+        .mobile-header .brand .titles { display: flex; flex-direction: column; line-height: 1.05; }
+        .mobile-header .brand .titles .name { font-weight: 800; letter-spacing: 0.2px; font-size: 1.1rem; }
+        .mobile-header .brand .titles .sub { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+        .mobile-menu-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            transition: all 0.2s;
+        }
+
+        /* Mobile Sidebar */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: -280px;
+            width: 280px;
+            height: 100vh;
+            padding: 18px;
+            background: var(--bg-primary);
+            border-right: 1px solid var(--border-color);
+            z-index: 1001;
+            transition: left 0.3s ease;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .sidebar.active {
+            left: 0;
+            box-shadow: 5px 0 30px rgba(0,0,0,0.3);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            backdrop-filter: blur(5px);
+        }
+
+        .sidebar-overlay.active {
+            display: block;
+        }
+
+        .main {
+            padding: 0;
+            padding-top: 74px; /* Account for mobile header */
+            min-height: 100vh;
+        }
+
+        .container {
+            padding: 15px;
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        /* =========================
+           MOBILE RESPONSIVE GRIDS
+           ========================= */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .ad-spends-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .social-media-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .platform-stats-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .brands-app-drawer {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .analytics-charts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .analytics-comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* =========================
+           CARD STYLES
+           ========================= */
+        .card {
+            border-radius: 16px;
+            padding: 18px;
+            transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
+            height: 100%;
+        }
+
+        .card.glass:hover {
+            transform: translateY(-3px);
+            background: rgba(255,255,255,0.085);
+            box-shadow:
+                0 26px 60px rgba(0,0,0,0.50),
+                inset 0 1px 0 rgba(255,255,255,0.14);
+        }
+        body[data-theme="light"] .card.glass:hover {
+            background: rgba(255,255,255,0.85);
+            box-shadow:
+                0 26px 60px rgba(2,6,23,0.14),
+                inset 0 1px 0 rgba(255,255,255,0.65);
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        body[data-theme="light"] .card-title { border-bottom: 1px solid rgba(15,23,42,0.10); }
+
+        .card-title i { color: var(--accent-blue-light); }
+
+        /* =========================
+           KPI STYLES
+           ========================= */
+        .kpi {
+            padding: 12px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            transition: all 0.2s;
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+        body[data-theme="light"] .kpi {
+            background: rgba(255,255,255,0.70);
+            border: 1px solid rgba(15,23,42,0.10);
+        }
+
+        .kpi:hover { background: rgba(255,255,255,0.09); }
+        body[data-theme="light"] .kpi:hover { background: rgba(255,255,255,0.88); }
+
+        .kpi-label { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; font-weight: 600; }
+        .kpi-value { font-size: 1.3rem; font-weight: 800; color: var(--text-primary); margin-bottom: 5px; }
+        .kpi-change { font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
+        .positive { color: var(--accent-green); }
+        .negative { color: var(--accent-red); }
+
+        /* =========================
+           MOBILE TABLE STYLES
+           ========================= */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            min-width: 600px; /* Force horizontal scroll on mobile */
+            width: 100%;
+            border-collapse: collapse;
+            background: transparent;
+        }
+
+        thead {
+            background: var(--thead-bg);
+            color: var(--text-primary);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+
+        th {
+            padding: 12px 10px;
+            text-align: left;
+            font-weight: 700;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            border-bottom: 1px solid rgba(255,255,255,0.14);
+        }
+        body[data-theme="light"] th { border-bottom: 1px solid rgba(15,23,42,0.10); }
+
+        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.10); transition: background-color 0.2s; }
+        tbody tr:hover { background-color: rgba(255,255,255,0.06); }
+        body[data-theme="light"] tbody tr { border-bottom: 1px solid rgba(15,23,42,0.08); }
+        body[data-theme="light"] tbody tr:hover { background-color: rgba(15,23,42,0.04); }
+
+        td { padding: 10px; color: var(--text-secondary); font-size: 0.85rem; }
+
+        .data-highlight { color: rgba(147, 197, 253, 0.95); font-weight: 700; }
+        body[data-theme="light"] .data-highlight { color: rgba(37, 99, 235, 0.95); }
+
+        /* =========================
+           MOBILE BUTTONS & CONTROLS
+           ========================= */
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: transform 0.2s, filter 0.2s;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(96, 165, 250, 0.95) 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(13, 167, 101, 0.95) 100%);
+            color: white;
+        }
+
+        .btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
+
+        .btn-outline {
+            background: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+            border: 1px solid rgba(255,255,255,0.14);
+        }
+        body[data-theme="light"] .btn-outline {
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(15,23,42,0.12);
+        }
+        .btn-outline:hover { background: rgba(255,255,255,0.10); }
+        body[data-theme="light"] .btn-outline:hover { background: rgba(255,255,255,0.88); }
+
+        .month-selector {
+            display: flex;
+            gap: 6px;
+            margin-top: 12px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .month-btn {
+            padding: 6px 10px;
+            background-color: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        .month-btn.active {
+            background-color: rgba(255,255,255,0.92);
+            color: rgba(30, 41, 59, 1);
+            font-weight: 700;
+        }
+
+        .month-btn:hover { background-color: rgba(255, 255, 255, 0.18); }
+
+        .platform-filter {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .filter-btn {
+            padding: 8px 12px;
+            border-radius: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            border: 1px solid rgba(255,255,255,0.14);
+            background: rgba(255,255,255,0.06);
+            color: var(--text-secondary);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            flex-shrink: 0;
+        }
+        body[data-theme="light"] .filter-btn {
+            border: 1px solid rgba(15,23,42,0.12);
+            background: rgba(255,255,255,0.72);
+        }
+
+        .filter-btn.active {
+            background: rgba(59, 130, 246, 0.55);
+            color: white;
+            border-color: rgba(59, 130, 246, 0.65);
+        }
+        body[data-theme="light"] .filter-btn.active {
+            background: rgba(37, 99, 235, 0.18);
+            color: rgba(15,23,42,0.92);
+            border-color: rgba(37, 99, 235, 0.30);
+        }
+
+        .filter-btn:hover { background: rgba(255,255,255,0.10); }
+        body[data-theme="light"] .filter-btn:hover { background: rgba(255,255,255,0.88); }
+
+        /* =========================
+           DASHBOARD HEADER
+           ========================= */
+        .dashboard-header {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+            border: 1px solid rgba(255,255,255,0.14);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (max-width: 767px) {
+            .dashboard-header {
+                margin: 0 -15px 20px;
+                border-radius: 0 0 20px 20px;
+            }
+        }
+
+        .dashboard-header::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 18% 30%, rgba(255,255,255,0.10) 0%, transparent 40%),
+                radial-gradient(circle at 82% 70%, rgba(255,255,255,0.06) 0%, transparent 45%);
+            pointer-events: none;
+        }
+
+        .brand-header {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            gap: 12px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+            justify-content: center;
+        }
+
+        .brand-logo {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.16);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            backdrop-filter: blur(10px);
+        }
+
+        .brand-logo i { font-size: 1.4rem; color: white; }
+
+        .brand-text .brand-name {
+            font-size: 1.6rem;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .brand-text .brand-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            color: rgba(255,255,255,0.88);
+            margin-top: 4px;
+            text-align: center;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .dashboard-title {
+            font-size: 1rem;
+            margin-top: 8px;
+            position: relative;
+            z-index: 1;
+            font-weight: 650;
+            text-align: center;
+            justify-content: center;
+        }
+
+        /* =========================
+           PLATFORM BADGES
+           ========================= */
+        .platform-badges { display: flex; justify-content: flex-start; gap: 10px; margin: 10px 0 12px; flex-wrap: wrap; }
+
+        .platform-badge {
+            padding: 8px 12px;
+            border-radius: 14px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            transition: transform 0.2s;
+            border: 1px solid rgba(255,255,255,0.16);
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+        body[data-theme="light"] .platform-badge {
+            border: 1px solid rgba(15,23,42,0.10);
+            background: rgba(255,255,255,0.72);
+        }
+
+        .platform-badge:hover { transform: translateY(-1px); }
+        .google-badge i { color: var(--chart-google); }
+        .meta-badge i { color: var(--chart-meta); }
+
+        /* =========================
+           COURSE BUDGET LIST
+           ========================= */
+        .course-budget-list { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
+
+        .course-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.12);
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            transition: transform 0.15s, background 0.2s, border-color 0.2s;
+        }
+        body[data-theme="light"] .course-item {
+            background: rgba(255,255,255,0.72);
+            border: 1px solid rgba(15,23,42,0.10);
+        }
+
+        .course-item:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.16); transform: translateY(-1px); }
+        body[data-theme="light"] .course-item:hover { background: rgba(255,255,255,0.88); border-color: rgba(15,23,42,0.12); }
+
+        .course-name {
+            color: rgba(248, 250, 252, 0.90);
+            font-weight: 700;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            max-width: 70%;
+        }
+        body[data-theme="light"] .course-name { color: rgba(15,23,42,0.88); }
+
+        .course-amount { color: rgba(147, 197, 253, 0.95); font-weight: 850; font-size: 0.9rem; white-space: nowrap; }
+        body[data-theme="light"] .course-amount { color: rgba(37, 99, 235, 0.95); }
+
+        /* =========================
+           AD ACCOUNT REPORT
+           ========================= */
+        .ad-account-report { border-radius: 18px; padding: 18px; margin-bottom: 22px; }
+
+        .ad-account-report h3 {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+        }
+
+        .ad-account-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
+        .ad-account-card { border-radius: 16px; padding: 14px; }
+
+        .ad-account-id {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+        }
+
+        .ad-account-name { font-size: 1rem; font-weight: 750; margin-bottom: 10px; color: var(--text-primary); }
+        .ad-account-metrics { margin-top: 8px; }
+
+        .ad-metric { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; }
+        .ad-metric-label { color: var(--text-muted); }
+        .ad-metric-value { font-weight: 750; color: rgba(147, 197, 253, 0.95); }
+        body[data-theme="light"] .ad-metric-value { color: rgba(37,99,235,0.95); }
+
+        .ad-account-total { border-radius: 16px; padding: 14px; margin-top: 14px; text-align: center; }
+        .ad-total-label { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 650; }
+        .ad-total-value { font-size: 1.5rem; font-weight: 900; color: var(--accent-green); }
+        .ad-total-sub { font-size: 0.85rem; color: var(--text-muted); margin-top: 6px; }
+
+        /* =========================
+           INTEGRATION HERO
+           ========================= */
+        .integration-hero { padding: 18px; border-radius: 18px; margin-bottom: 18px; }
+
+        .integration-hero h2 { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; margin-bottom: 8px; }
+        .integration-hero p { color: var(--text-secondary); margin-top: 4px; line-height: 1.35; font-size: 0.9rem; }
+
+        .sheet-input { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+
+        .sheet-input input {
+            padding: 10px 14px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            min-width: 320px;
+            font-size: 0.92rem;
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+        }
+        body[data-theme="light"] .sheet-input input {
+            border: 1px solid rgba(15,23,42,0.12);
+            background: rgba(255,255,255,0.75);
+        }
+
+        .sheet-input input::placeholder { color: rgba(255, 255, 255, 0.65); }
+        body[data-theme="light"] .sheet-input input::placeholder { color: rgba(15,23,42,0.55); }
+
+        .sheet-input input:focus {
+            outline: none;
+            border-color: rgba(96,165,250,0.7);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
+        }
+
+        .loading { display: none; text-align: left; padding: 12px 2px 0; color: var(--text-secondary); }
+        .loading i { animation: spin 1s linear infinite; margin-right: 8px; }
+
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        /* =========================
+           SIDEBAR NAVIGATION
+           ========================= */
         .sidebar .brand {
             display: flex;
             align-items: center;
@@ -297,6 +918,7 @@
             align-items: center;
             gap: 10px;
             transition: background 0.2s, border-color 0.2s, transform 0.15s;
+            font-size: 0.95rem;
         }
 
         .nav button:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.08); }
@@ -407,438 +1029,9 @@
         body[data-theme="light"] .switch .knob { box-shadow: 0 10px 18px rgba(2,6,23,0.14); }
         .switch[data-on="1"] .knob { left: 27px; }
 
-        .main { padding: 20px; }
-        .container { max-width: 1800px; margin: 0 auto; }
-
-        .page { display: none; }
-        .page.active { display: block; }
-
-        .dashboard-header {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.9) 0%, rgba(139, 92, 246, 0.9) 100%);
-            color: white;
-            padding: 26px 28px;
-            border-radius: 18px;
-            margin-bottom: 22px;
-            box-shadow: 0 18px 40px rgba(0,0,0,0.35);
-            border: 1px solid rgba(255,255,255,0.14);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .dashboard-header::before {
-            content: "";
-            position: absolute;
-            inset: 0;
-            background:
-                radial-gradient(circle at 18% 30%, rgba(255,255,255,0.10) 0%, transparent 40%),
-                radial-gradient(circle at 82% 70%, rgba(255,255,255,0.06) 0%, transparent 45%);
-            pointer-events: none;
-        }
-
-        .brand-header {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            gap: 14px;
-            margin-bottom: 12px;
-            position: relative;
-            z-index: 1;
-            justify-content: center;
-        }
-
-        .brand-logo {
-            width: 58px;
-            height: 58px;
-            background: rgba(255, 255, 255, 0.16);
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            backdrop-filter: blur(10px);
-        }
-
-        .brand-logo i { font-size: 1.55rem; color: white; }
-
-        .brand-text .brand-name {
-            font-size: 2rem;
-            font-weight: 800;
-            letter-spacing: 0.4px;
-            text-align: center;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .brand-text .brand-subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-            color: rgba(255,255,255,0.88);
-            margin-top: 6px;
-            text-align: center;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .dashboard-title {
-            font-size: 1.2rem;
-            margin-top: 10px;
-            position: relative;
-            z-index: 1;
-            font-weight: 650;
-            text-align: center;
-            justify-content: center;
-        }
-
-        .month-selector {
-            justify-content: center;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 14px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .month-btn {
-            padding: 6px 12px;
-            background-color: rgba(255, 255, 255, 0.12);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.22);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.85rem;
-        }
-
-        .month-btn.active {
-            background-color: rgba(255,255,255,0.92);
-            color: rgba(30, 41, 59, 1);
-            font-weight: 700;
-        }
-
-        .month-btn:hover { background-color: rgba(255, 255, 255, 0.18); }
-
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 18px;
-            margin-bottom: 22px;
-        }
-
-        .card {
-            border-radius: 18px;
-            padding: 20px;
-            transition: transform 0.25s, box-shadow 0.25s, background 0.25s;
-            height: 100%;
-        }
-
-        .card.glass:hover {
-            transform: translateY(-3px);
-            background: rgba(255,255,255,0.085);
-            box-shadow:
-                0 26px 60px rgba(0,0,0,0.50),
-                inset 0 1px 0 rgba(255,255,255,0.14);
-        }
-        body[data-theme="light"] .card.glass:hover {
-            background: rgba(255,255,255,0.85);
-            box-shadow:
-                0 26px 60px rgba(2,6,23,0.14),
-                inset 0 1px 0 rgba(255,255,255,0.65);
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 14px;
-            color: var(--text-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.12);
-        }
-        body[data-theme="light"] .card-title { border-bottom: 1px solid rgba(15,23,42,0.10); }
-
-        .card-title i { color: var(--accent-blue-light); }
-
-        .kpi-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; }
-
-        .kpi {
-            padding: 14px;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            transition: all 0.2s;
-            backdrop-filter: blur(14px) saturate(160%);
-            -webkit-backdrop-filter: blur(14px) saturate(160%);
-        }
-        body[data-theme="light"] .kpi {
-            background: rgba(255,255,255,0.70);
-            border: 1px solid rgba(15,23,42,0.10);
-        }
-
-        .kpi:hover { background: rgba(255,255,255,0.09); }
-        body[data-theme="light"] .kpi:hover { background: rgba(255,255,255,0.88); }
-
-        .kpi-label { font-size: 0.86rem; color: var(--text-muted); margin-bottom: 8px; font-weight: 600; }
-        .kpi-value { font-size: 1.5rem; font-weight: 800; color: var(--text-primary); margin-bottom: 5px; }
-        .kpi-change { font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
-        .positive { color: var(--accent-green); }
-        .negative { color: var(--accent-red); }
-
-        .platform-badges { display: flex; justify-content: flex-start; gap: 12px; margin: 10px 0 12px; flex-wrap: wrap; }
-
-        .platform-badge {
-            padding: 8px 14px;
-            border-radius: 14px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            transition: transform 0.2s;
-            border: 1px solid rgba(255,255,255,0.16);
-            background: rgba(255,255,255,0.07);
-            backdrop-filter: blur(14px) saturate(160%);
-            -webkit-backdrop-filter: blur(14px) saturate(160%);
-        }
-        body[data-theme="light"] .platform-badge {
-            border: 1px solid rgba(15,23,42,0.10);
-            background: rgba(255,255,255,0.72);
-        }
-
-        .platform-badge:hover { transform: translateY(-1px); }
-        .google-badge i { color: var(--chart-google); }
-        .meta-badge i { color: var(--chart-meta); }
-
-        .course-budget-list { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
-
-        .course-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 12px 14px;
-            border-radius: 16px;
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.12);
-            backdrop-filter: blur(14px) saturate(160%);
-            -webkit-backdrop-filter: blur(14px) saturate(160%);
-            transition: transform 0.15s, background 0.2s, border-color 0.2s;
-        }
-        body[data-theme="light"] .course-item {
-            background: rgba(255,255,255,0.72);
-            border: 1px solid rgba(15,23,42,0.10);
-        }
-
-        .course-item:hover { background: rgba(255,255,255,0.09); border-color: rgba(255,255,255,0.16); transform: translateY(-1px); }
-        body[data-theme="light"] .course-item:hover { background: rgba(255,255,255,0.88); border-color: rgba(15,23,42,0.12); }
-
-        .course-name {
-            color: rgba(248, 250, 252, 0.90);
-            font-weight: 700;
-            font-size: 0.95rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            max-width: 70%;
-        }
-        body[data-theme="light"] .course-name { color: rgba(15,23,42,0.88); }
-
-        .course-amount { color: rgba(147, 197, 253, 0.95); font-weight: 850; font-size: 0.95rem; white-space: nowrap; }
-        body[data-theme="light"] .course-amount { color: rgba(37, 99, 235, 0.95); }
-
-        .table-container {
-            overflow-x: auto;
-            border-radius: 18px;
-            margin-bottom: 22px;
-            border: 1px solid rgba(255,255,255,0.12);
-        }
-        body[data-theme="light"] .table-container { border: 1px solid rgba(15,23,42,0.10); }
-
-        .table-container.glass { padding-bottom: 8px; }
-
-        table { width: 100%; border-collapse: collapse; background: transparent; }
-
-        thead {
-            background: var(--thead-bg);
-            color: var(--text-primary);
-            backdrop-filter: blur(14px) saturate(160%);
-            -webkit-backdrop-filter: blur(14px) saturate(160%);
-        }
-
-        th {
-            padding: 14px 12px;
-            text-align: left;
-            font-weight: 700;
-            font-size: 0.95rem;
-            white-space: nowrap;
-            border-bottom: 1px solid rgba(255,255,255,0.14);
-        }
-        body[data-theme="light"] th { border-bottom: 1px solid rgba(15,23,42,0.10); }
-
-        tbody tr { border-bottom: 1px solid rgba(255,255,255,0.10); transition: background-color 0.2s; }
-        tbody tr:hover { background-color: rgba(255,255,255,0.06); }
-        body[data-theme="light"] tbody tr { border-bottom: 1px solid rgba(15,23,42,0.08); }
-        body[data-theme="light"] tbody tr:hover { background-color: rgba(15,23,42,0.04); }
-
-        td { padding: 12px; color: var(--text-secondary); font-size: 0.9rem; }
-
-        .data-highlight { color: rgba(147, 197, 253, 0.95); font-weight: 700; }
-        body[data-theme="light"] .data-highlight { color: rgba(37, 99, 235, 0.95); }
-
-        .btn {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 14px;
-            font-weight: 700;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: transform 0.2s, filter 0.2s;
-            font-size: 0.9rem;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.95) 0%, rgba(96, 165, 250, 0.95) 100%);
-            color: white;
-        }
-
-        .btn-success {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.95) 0%, rgba(13, 167, 101, 0.95) 100%);
-            color: white;
-        }
-
-        .btn:hover { transform: translateY(-1px); filter: brightness(1.03); }
-
-        .integration-hero { padding: 18px; border-radius: 18px; margin-bottom: 18px; }
-
-        .integration-hero h2 { display: flex; align-items: center; gap: 10px; font-size: 1.25rem; margin-bottom: 8px; }
-        .integration-hero p { color: var(--text-secondary); margin-top: 4px; line-height: 1.35; }
-
-        .sheet-input { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
-
-        .sheet-input input {
-            padding: 10px 14px;
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.18);
-            background: rgba(255, 255, 255, 0.06);
-            color: var(--text-primary);
-            min-width: 320px;
-            font-size: 0.92rem;
-            backdrop-filter: blur(14px) saturate(160%);
-            -webkit-backdrop-filter: blur(14px) saturate(160%);
-        }
-        body[data-theme="light"] .sheet-input input {
-            border: 1px solid rgba(15,23,42,0.12);
-            background: rgba(255,255,255,0.75);
-        }
-
-        .sheet-input input::placeholder { color: rgba(255, 255, 255, 0.65); }
-        body[data-theme="light"] .sheet-input input::placeholder { color: rgba(15,23,42,0.55); }
-
-        .sheet-input input:focus {
-            outline: none;
-            border-color: rgba(96,165,250,0.7);
-            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18);
-        }
-
-        .loading { display: none; text-align: left; padding: 12px 2px 0; color: var(--text-secondary); }
-        .loading i { animation: spin 1s linear infinite; margin-right: 8px; }
-
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-
-        .ad-account-report { border-radius: 18px; padding: 18px; margin-bottom: 22px; }
-
-        .ad-account-report h3 {
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.2rem;
-            color: var(--text-primary);
-        }
-
-        .ad-account-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; }
-        .ad-account-card { border-radius: 16px; padding: 14px; }
-
-        .ad-account-id {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-        }
-
-        .ad-account-name { font-size: 1.05rem; font-weight: 750; margin-bottom: 10px; color: var(--text-primary); }
-        .ad-account-metrics { margin-top: 8px; }
-
-        .ad-metric { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.92rem; }
-        .ad-metric-label { color: var(--text-muted); }
-        .ad-metric-value { font-weight: 750; color: rgba(147, 197, 253, 0.95); }
-        body[data-theme="light"] .ad-metric-value { color: rgba(37,99,235,0.95); }
-
-        .ad-account-total { border-radius: 16px; padding: 14px; margin-top: 14px; text-align: center; }
-        .ad-total-label { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: 6px; font-weight: 650; }
-        .ad-total-value { font-size: 1.8rem; font-weight: 900; color: var(--accent-green); }
-        .ad-total-sub { font-size: 0.9rem; color: var(--text-muted); margin-top: 6px; }
-
-        /* NEW: Side-by-side layout for Google + Meta ad account spends */
-        .ad-spends-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 18px;
-            margin-bottom: 22px;
-        }
-        @media (max-width: 980px) {
-            .ad-spends-row { grid-template-columns: 1fr; }
-        }
-
-        .platform-filter { display: flex; gap: 10px; margin: 12px 15px 0; flex-wrap: wrap; }
-
-        .filter-btn {
-            padding: 8px 14px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            border: 1px solid rgba(255,255,255,0.14);
-            background: rgba(255,255,255,0.06);
-            color: var(--text-secondary);
-            backdrop-filter: blur(14px) saturate(160%);
-            -webkit-backdrop-filter: blur(14px) saturate(160%);
-        }
-        body[data-theme="light"] .filter-btn {
-            border: 1px solid rgba(15,23,42,0.12);
-            background: rgba(255,255,255,0.72);
-        }
-
-        .filter-btn.active {
-            background: rgba(59, 130, 246, 0.55);
-            color: white;
-            border-color: rgba(59, 130, 246, 0.65);
-        }
-        body[data-theme="light"] .filter-btn.active {
-            background: rgba(37, 99, 235, 0.18);
-            color: rgba(15,23,42,0.92);
-            border-color: rgba(37, 99, 235, 0.30);
-        }
-
-        .filter-btn:hover { background: rgba(255,255,255,0.10); }
-        body[data-theme="light"] .filter-btn:hover { background: rgba(255,255,255,0.88); }
-
-        footer {
-            text-align: center;
-            padding: 18px 10px;
-            color: var(--text-muted);
-            font-size: 0.9rem;
-            border-top: 1px solid rgba(255,255,255,0.10);
-            margin-top: 10px;
-        }
-        body[data-theme="light"] footer { border-top: 1px solid rgba(15,23,42,0.10); }
-
-        /* Campaign Details toggle (existing) */
+        /* =========================
+           CAMPAIGN DETAILS TOGGLE
+           ========================= */
         .campaign-toggle-bar {
             display: flex;
             gap: 10px;
@@ -849,19 +1042,9 @@
         }
         .campaign-table-hidden { display: none !important; }
 
-        .btn-outline {
-            background: rgba(255,255,255,0.06);
-            color: var(--text-primary);
-            border: 1px solid rgba(255,255,255,0.14);
-        }
-        body[data-theme="light"] .btn-outline {
-            background: rgba(255,255,255,0.72);
-            border: 1px solid rgba(15,23,42,0.12);
-        }
-        .btn-outline:hover { background: rgba(255,255,255,0.10); }
-        body[data-theme="light"] .btn-outline:hover { background: rgba(255,255,255,0.88); }
-
-        /* NEW: Course filters (Department + HOD) */
+        /* =========================
+           COURSE FILTERS
+           ========================= */
         .course-filters {
             display: flex;
             gap: 12px;
@@ -889,6 +1072,7 @@
             backdrop-filter: blur(14px) saturate(160%);
             -webkit-backdrop-filter: blur(14px) saturate(160%);
             outline: none;
+            width: 100%;
         }
         body[data-theme="light"] .course-filters select {
             border: 1px solid rgba(15,23,42,0.12);
@@ -896,129 +1080,578 @@
             color: var(--text-primary);
         }
 
-        @media (max-width: 980px) {
-            .app-shell { grid-template-columns: 1fr; }
-            .sidebar { position: relative; height: auto; }
-        }
-
-        @media (max-width: 768px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-            .kpi-container { grid-template-columns: 1fr; }
-            .sheet-input { flex-direction: column; }
-            .sheet-input input { min-width: 100%; }
-            .course-filters .filter-group { min-width: 100%; }
-        }
-
-        .section-gap { margin-bottom: 22px; }
         /* =========================
-   Select / Dropdown Visibility Fix
-   ========================= */
-select {
-  color: var(--text-primary) !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
-  border-radius: 14px;
-  padding: 10px 14px;
-  outline: none;
-  appearance: auto;
-  -webkit-appearance: auto;
-}
+           SOCIAL MEDIA STYLES
+           ========================= */
+        .brand-card {
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 150px;
+        }
 
-/* Dropdown list items */
-select option {
-  color: var(--text-primary) !important;
-  background: var(--bg-primary) !important; /* ensures list isn't white */
-}
+        .brand-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+        }
 
-/* Improve native control rendering in dark mode */
-body[data-theme="dark"] select {
-  color-scheme: dark;
-}
+        .brand-logo-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+            font-size: 1.5rem;
+            color: white;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
 
-body[data-theme="light"] select {
-  color-scheme: light;
-  background: rgba(255,255,255,0.72) !important;
-  border: 1px solid rgba(15,23,42,0.12) !important;
-}
+        .brand-logo-icon-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+        }
 
-body[data-theme="light"] select option {
-  background: #ffffff !important;
-  color: #0f172a !important;
-}
+        .brand-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 6px;
+        }
 
-/* =========================
-/* =========================
-   COURSE-WISE FILTER UI FIXES
-   ========================= */
+        .brand-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
 
-/* Make the table container have breathing space */
-#courseWisePage .table-container.glass {
-  padding-top: 12px;
-}
+        .social-platform-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
 
-/* Control spacing for the "Course Breakdown" title */
-#courseWisePage .course-breakdown-title {
-  margin: 12px 15px 14px !important; /* top, left/right, bottom */
-}
+        .platform-tab {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
 
-/* Filter row layout + spacing */
-#courseWisePage .course-filters {
-  display: flex;
-  gap: 14px;
-  align-items: flex-end;
-  flex-wrap: wrap;
+        .platform-tab.active {
+            background: rgba(59, 130, 246, 0.25);
+            color: white;
+            border-color: rgba(59, 130, 246, 0.5);
+        }
 
-  margin: 0 15px 18px;      /* fixes header-to-filter spacing */
-  padding-top: 6px;         /* extra air under title */
-}
+        .platform-tab:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
 
-/* Labels */
-#courseWisePage .course-filters label {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  font-weight: 700;
-}
+        .social-kpi {
+            padding: 16px;
+            border-radius: 16px;
+            text-align: center;
+        }
 
-/* ✅ Dropdown visibility fix: select + options */
-#courseWisePage .course-filters select {
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: 14px;
+        .social-kpi-value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin: 10px 0;
+        }
 
-  color: var(--text-primary) !important;
-  background: rgba(255,255,255,0.06) !important;
-  border: 1px solid rgba(255,255,255,0.14) !important;
+        .social-kpi-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
 
-  outline: none;
-  appearance: auto;
-  -webkit-appearance: auto;
-}
+        .social-kpi-change {
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
 
-/* Dropdown options list */
-#courseWisePage .course-filters select option {
-  color: var(--text-primary) !important;
-  background: var(--bg-primary) !important;
-}
+        .distribution-chart-container {
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
 
-/* Force correct native rendering for dark mode dropdowns (Windows Chrome fix) */
-body[data-theme="dark"] #courseWisePage .course-filters select {
-  color-scheme: dark;
-}
+        .growth-chart-container {
+            padding: 16px;
+            border-radius: 16px;
+            margin-bottom: 20px;
+        }
 
-/* Light mode overrides */
-body[data-theme="light"] #courseWisePage .course-filters select {
-  color-scheme: light;
-  background: rgba(255,255,255,0.75) !important;
-  border: 1px solid rgba(15,23,42,0.12) !important;
-  color: rgba(15,23,42,0.92) !important;
-}
+        .social-filter-row {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
 
-body[data-theme="light"] #courseWisePage .course-filters select option {
-  background: #ffffff !important;
-  color: #0f172a !important;
-}
+        .social-month-filter {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
 
+        .social-month-btn {
+            padding: 8px 12px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
 
+        .social-month-btn.active {
+            background: rgba(59, 130, 246, 0.25);
+            color: white;
+            border-color: rgba(59, 130, 246, 0.5);
+        }
+
+        .social-month-btn:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .social-back-btn {
+            padding: 10px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            align-self: flex-start;
+        }
+
+        .social-back-btn:hover {
+            background: rgba(255, 255, 255, 0.10);
+        }
+
+        .social-platform-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: white;
+            margin-right: 8px;
+        }
+
+        .instagram-bg { background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D); }
+        .facebook-bg { background: linear-gradient(45deg, #1877F2, #0A7BFF); }
+        .linkedin-bg { background: linear-gradient(45deg, #0077B5, #00A0DC); }
+        .youtube-bg { background: linear-gradient(45deg, #FF0000, #FF3333); }
+
+        .platform-stat-card {
+            padding: 16px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .platform-stat-info {
+            flex: 1;
+        }
+
+        .platform-stat-value {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+        }
+
+        .platform-stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Brand-specific colors */
+        .aafm-brand { background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(59, 130, 246, 0.4)); }
+        .aapm-brand { background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(16, 185, 129, 0.4)); }
+        .nexgen-brand { background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(139, 92, 246, 0.4)); }
+        .flab-brand { background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(245, 158, 11, 0.4)); }
+
+        .aafm-brand-solid { background: linear-gradient(135deg, #3b82f6, #1d4ed8); }
+        .aapm-brand-solid { background: linear-gradient(135deg, #10b981, #059669); }
+        .nexgen-brand-solid { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
+        .flab-brand-solid { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        /* =========================
+           ANALYTICS PAGE STYLES
+           ========================= */
+        .analytics-chart-container {
+            padding: 18px;
+            border-radius: 16px;
+            min-height: 300px;
+        }
+
+        .comparison-card {
+            padding: 18px;
+            border-radius: 16px;
+            text-align: center;
+        }
+
+        .comparison-title {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .comparison-value {
+            font-size: 2rem;
+            font-weight: 900;
+            margin: 10px 0;
+        }
+
+        .comparison-change {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        /* =========================
+           MONTH SORT FILTER
+           ========================= */
+        .month-sort-filter {
+            display: flex;
+            gap: 10px;
+            margin: 0 15px 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .sort-label {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .sort-select {
+            padding: 8px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-primary);
+            min-width: 160px;
+            backdrop-filter: blur(14px) saturate(160%);
+            -webkit-backdrop-filter: blur(14px) saturate(160%);
+            outline: none;
+        }
+
+        body[data-theme="light"] .sort-select {
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            background: rgba(255, 255, 255, 0.72);
+        }
+
+        /* =========================
+           FOOTER
+           ========================= */
+        footer {
+            text-align: center;
+            padding: 18px 10px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid rgba(255,255,255,0.10);
+            margin-top: 10px;
+        }
+        body[data-theme="light"] footer { border-top: 1px solid rgba(15,23,42,0.10); }
+
+        /* =========================
+           SELECT / DROPDOWN FIXES
+           ========================= */
+        select {
+          color: var(--text-primary) !important;
+          background: rgba(255,255,255,0.06) !important;
+          border: 1px solid rgba(255,255,255,0.14) !important;
+          border-radius: 14px;
+          padding: 10px 14px;
+          outline: none;
+          appearance: auto;
+          -webkit-appearance: auto;
+          font-size: 16px; /* Prevent iOS zoom */
+        }
+
+        select option {
+          color: var(--text-primary) !important;
+          background: var(--bg-primary) !important;
+        }
+
+        body[data-theme="dark"] select {
+          color-scheme: dark;
+        }
+
+        body[data-theme="light"] select {
+          color-scheme: light;
+          background: rgba(255,255,255,0.72) !important;
+          border: 1px solid rgba(15,23,42,0.12) !important;
+        }
+
+        body[data-theme="light"] select option {
+          background: #ffffff !important;
+          color: #0f172a !important;
+        }
+
+        /* =========================
+           UTILITY CLASSES
+           ========================= */
+        .hide-on-mobile {
+            display: none;
+        }
+
+        .show-on-mobile {
+            display: block;
+        }
+
+        .section-gap { margin-bottom: 20px; }
+
+        /* =========================
+           TABLET BREAKPOINT (768px)
+           ========================= */
+        @media (min-width: 768px) {
+            .mobile-header {
+                display: none;
+            }
+
+            .sidebar {
+                position: sticky;
+                left: 0;
+                width: 270px;
+            }
+
+            .app-shell {
+                display: grid;
+                grid-template-columns: 270px 1fr;
+            }
+
+            .main {
+                padding: 20px;
+                padding-top: 0;
+            }
+
+            .container {
+                padding: 0;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .kpi-container {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .ad-spends-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .social-media-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .brands-app-drawer {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .analytics-comparison-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .platform-stats-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .hide-on-mobile {
+                display: block;
+            }
+
+            .show-on-mobile {
+                display: none;
+            }
+
+            .kpi-value {
+                font-size: 1.5rem;
+            }
+
+            .social-kpi-value {
+                font-size: 2.2rem;
+            }
+
+            .comparison-value {
+                font-size: 2.5rem;
+            }
+
+            .ad-total-value {
+                font-size: 1.8rem;
+            }
+
+            .card-title {
+                font-size: 1.1rem;
+            }
+
+            .dashboard-header {
+                padding: 26px 28px;
+            }
+
+            .brand-text .brand-name {
+                font-size: 2rem;
+            }
+        }
+
+        /* =========================
+           DESKTOP BREAKPOINT (1024px)
+           ========================= */
+        @media (min-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .social-media-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .brands-app-drawer {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
+            .analytics-charts-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .platform-stats-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+
+        /* =========================
+           LARGE DESKTOP BREAKPOINT (1200px)
+           ========================= */
+        @media (min-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* =========================
+           TOUCH-FRIENDLY STYLES
+           ========================= */
+        @media (hover: none) and (pointer: coarse) {
+            button, 
+            .btn, 
+            .nav button,
+            .icon-btn,
+            .filter-btn,
+            .month-btn {
+                min-height: 44px;
+                padding: 12px 16px;
+            }
+
+            input,
+            select {
+                font-size: 16px;
+                min-height: 44px;
+            }
+
+            .card {
+                padding: 16px;
+            }
+
+            .table-container {
+                margin-left: -15px;
+                margin-right: -15px;
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+
+            .card.glass:hover {
+                transform: none;
+            }
+        }
+
+        /* =========================
+           SCROLLBAR STYLING
+           ========================= */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* =========================
+           ANIMATIONS
+           ========================= */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        .error-shake {
+            animation: shake 0.5s ease-in-out;
+            border-color: rgba(239, 68, 68, 0.8) !important;
+        }
+
+        /* =========================
+           PAGE TRANSITIONS
+           ========================= */
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
     </style>
 </head>
 
@@ -1071,9 +1704,26 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
 
     <!-- App Shell (Sidebar + Main) -->
     <div class="app-shell" id="appShell">
+        <!-- Mobile Header -->
+        <div class="mobile-header">
+            <div class="brand">
+                <div class="logo"><i class="fas fa-chart-line"></i></div>
+                <div class="titles">
+                    <div class="name">AAFM India</div>
+                    <div class="sub hide-on-mobile">Marketing Budget</div>
+                </div>
+            </div>
+            <button class="mobile-menu-btn" id="mobileMenuBtn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+
+        <!-- Sidebar Overlay for Mobile -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
         <!-- Sidebar -->
         <aside class="sidebar">
-            <div class="brand glass">
+            <div class="brand glass hide-on-mobile">
                 <div class="logo"><i class="fas fa-chart-line"></i></div>
                 <div class="titles">
                     <div class="name">AAFM India</div>
@@ -1081,12 +1731,21 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                 </div>
             </div>
 
+            <!-- Mobile Close Button -->
+            <button class="mobile-menu-btn show-on-mobile" id="closeMenuBtn" style="margin-bottom: 20px;">
+                <i class="fas fa-times"></i> Close Menu
+            </button>
+
             <!-- Sidebar Tabs -->
             <nav class="nav">
                 <button class="active" data-page="dashboardPage"><i class="fas fa-grid-2"></i> Dashboard</button>
+                <button data-page="analyticsPage"><i class="fas fa-chart-bar"></i> Analytics</button>
                 <button data-page="courseWisePage"><i class="fas fa-graduation-cap"></i> Course-Wise Budget</button>
                 <button data-page="campaignDetailsPage"><i class="fas fa-list-alt"></i> Campaign Details</button>
                 <button data-page="monthlySummaryPage"><i class="fas fa-calendar-alt"></i> Monthly Summary</button>
+                <!-- NEW: Social Media Report Tab -->
+                <button data-page="socialMediaPage"><i class="fas fa-chart-line"></i> Social Media Report</button>
+                <button data-page="conversionRatePage"><i class="fas fa-percentage"></i> Conversion Rate</button>
                 <button data-page="integrationsPage"><i class="fas fa-plug"></i> Integrations</button>
             </nav>
 
@@ -1284,6 +1943,16 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                             </button>
                         </div>
 
+                        <!-- NEW: Month Sort Filter for Campaign Details -->
+                        <div class="month-sort-filter">
+                            <div class="sort-label">Sort by Month:</div>
+                            <select class="sort-select" id="campaignMonthSort">
+                                <option value="default">Default Order</option>
+                                <option value="month-asc">Month (Ascending)</option>
+                                <option value="month-desc">Month (Descending)</option>
+                            </select>
+                        </div>
+
                         <div class="platform-filter" id="platformFilter">
                             <button class="filter-btn active" data-platform="all">All Platforms</button>
                             <button class="filter-btn" data-platform="Google">Google Ads Only</button>
@@ -1318,59 +1987,133 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                     </footer>
                 </section>
 
-             <!-- COURSE-WISE BUDGET PAGE -->
-<section class="page" id="courseWisePage">
-  <div class="integration-hero glass">
-    <h2><i class="fas fa-graduation-cap"></i> Course-Wise Budget</h2>
-    <p>Detailed course-wise budget spent (based on currently selected filters: Month + Platform + Department + Head of Department).</p>
-  </div>
+                <!-- NEW: ANALYTICS PAGE -->
+                <section class="page" id="analyticsPage">
+                    <header class="dashboard-header">
+                        <div class="brand-header">
+                            <div class="brand-logo"><i class="fas fa-chart-bar"></i></div>
+                            <div class="brand-text">
+                                <div class="brand-name">Analytics</div>
+                                <div class="brand-subtitle">Budget Spent Analysis & Monthly Comparisons</div>
+                            </div>
+                        </div>
+                    </header>
 
-  <div class="table-container glass">
-    <h3 class="card-title course-breakdown-title">
-      <i class="fas fa-table"></i> Course Breakdown
-    </h3>
+                    <div class="analytics-comparison-grid">
+                        <div class="card glass comparison-card">
+                            <div class="comparison-title">Current Month vs Previous Month</div>
+                            <div class="kpi-value" id="currentVsPrevious">0%</div>
+                            <div class="comparison-change" id="currentVsPreviousChange">
+                                <i class="fas fa-arrow-up positive"></i> <span>0% Change</span>
+                            </div>
+                        </div>
 
-    <!-- Department + HOD filters -->
-    <div class="course-filters">
-      <div class="filter-group">
-        <label for="departmentSelect"><i class="fas fa-building"></i> Department Filter</label>
-        <select id="departmentSelect">
-          <option value="all">All Departments</option>
-        </select>
-      </div>
+                        <div class="card glass comparison-card">
+                            <div class="comparison-title">Best Performing Month</div>
+                            <div class="kpi-value" id="bestMonth">--</div>
+                            <div class="comparison-change">
+                                Highest Budget: <span id="bestMonthBudget">₹0</span>
+                            </div>
+                        </div>
 
-      <div class="filter-group">
-        <label for="hodSelect"><i class="fas fa-user-tie"></i> Head of Department Filter</label>
-        <select id="hodSelect">
-          <option value="all">All Heads of Department</option>
-        </select>
-      </div>
+                        <div class="card glass comparison-card">
+                            <div class="comparison-title">Average Monthly Spend</div>
+                            <div class="kpi-value" id="avgMonthlySpend">₹0</div>
+                            <div class="comparison-change">
+                                Across <span id="totalMonths">0</span> months
+                            </div>
+                        </div>
+                    </div>
 
-      <div class="filter-group" style="min-width:180px;">
-        <label>&nbsp;</label>
-        <button class="btn btn-outline" id="resetDeptHodBtn" type="button">
-          <i class="fas fa-rotate-left"></i> Reset
-        </button>
-      </div>
-    </div>
+                    <div class="analytics-charts-grid">
+                        <div class="card glass analytics-chart-container">
+                            <h3 class="card-title"><i class="fas fa-chart-line"></i> Monthly Budget Trend</h3>
+                            <canvas id="monthlyBudgetChart" height="250"></canvas>
+                        </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Course</th>
-          <th>Department</th>
-          <th>Head of Department</th>
-          <th>Total Budget (₹)</th>
-          <th>Total Leads</th>
-          <th>Avg Cost/Lead (₹)</th>
-        </tr>
-      </thead>
-      <tbody id="courseWiseTableBody">
-        <tr><td colspan="6" style="text-align:center; padding: 20px;">No course data loaded</td></tr>
-      </tbody>
-    </table>
-  </div>
-</section>
+                        <div class="card glass analytics-chart-container">
+                            <h3 class="card-title"><i class="fas fa-chart-bar"></i> Platform Comparison by Month</h3>
+                            <canvas id="platformComparisonChart" height="250"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="card glass">
+                        <h3 class="card-title"><i class="fas fa-table"></i> Monthly Performance Insights</h3>
+                        <div class="table-container" style="border: none; margin: 0;">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Month</th>
+                                        <th>Total Budget</th>
+                                        <th>Leads Generated</th>
+                                        <th>Cost/Lead</th>
+                                        <th>Growth vs Previous</th>
+                                        <th>Efficiency Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="monthlyInsightsTable">
+                                    <tr>
+                                        <td colspan="6" style="text-align:center; padding: 20px;">Load data to see insights</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- COURSE-WISE BUDGET PAGE -->
+                <section class="page" id="courseWisePage">
+                    <div class="integration-hero glass">
+                        <h2><i class="fas fa-graduation-cap"></i> Course-Wise Budget</h2>
+                        <p>Detailed course-wise budget spent (based on currently selected filters: Month + Platform + Department + Head of Department).</p>
+                    </div>
+
+                    <div class="table-container glass">
+                        <h3 class="card-title course-breakdown-title">
+                            <i class="fas fa-table"></i> Course Breakdown
+                        </h3>
+
+                        <!-- Department + HOD filters -->
+                        <div class="course-filters">
+                            <div class="filter-group">
+                                <label for="departmentSelect"><i class="fas fa-building"></i> Department Filter</label>
+                                <select id="departmentSelect">
+                                    <option value="all">All Departments</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group">
+                                <label for="hodSelect"><i class="fas fa-user-tie"></i> Head of Department Filter</label>
+                                <select id="hodSelect">
+                                    <option value="all">All Heads of Department</option>
+                                </select>
+                            </div>
+
+                            <div class="filter-group" style="min-width:180px;">
+                                <label>&nbsp;</label>
+                                <button class="btn btn-outline" id="resetDeptHodBtn" type="button">
+                                    <i class="fas fa-rotate-left"></i> Reset
+                                </button>
+                            </div>
+                        </div>
+
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Course</th>
+                                    <th>Department</th>
+                                    <th>Head of Department</th>
+                                    <th>Total Budget (₹)</th>
+                                    <th>Total Leads</th>
+                                    <th>Avg Cost/Lead (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="courseWiseTableBody">
+                                <tr><td colspan="6" style="text-align:center; padding: 20px;">No course data loaded</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
 
                 <!-- CAMPAIGN DETAILS PAGE -->
                 <section class="page" id="campaignDetailsPage">
@@ -1382,6 +2125,16 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                     <div class="table-container glass">
                         <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin: 15px; flex-wrap: wrap;">
                             <h3 class="card-title" style="margin: 0;"><i class="fas fa-list-alt"></i> Campaign List</h3>
+                        </div>
+
+                        <!-- NEW: Month Sort Filter for Campaign Details Page -->
+                        <div class="month-sort-filter">
+                            <div class="sort-label">Sort by Month:</div>
+                            <select class="sort-select" id="campaignPageMonthSort">
+                                <option value="default">Default Order</option>
+                                <option value="month-asc">Month (Ascending)</option>
+                                <option value="month-desc">Month (Descending)</option>
+                            </select>
                         </div>
 
                         <div class="platform-filter">
@@ -1438,6 +2191,151 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                     </div>
                 </section>
 
+                <!-- NEW: SOCIAL MEDIA REPORT PAGE -->
+                <section class="page" id="socialMediaPage">
+                    <div class="integration-hero glass">
+                        <h2><i class="fas fa-chart-line"></i> Social Media Analytics Dashboard</h2>
+                        <p>Track social media performance across all brands and platforms. Click on any brand to view detailed analytics.</p>
+                    </div>
+
+                    <!-- Brands App Drawer -->
+                    <div class="brands-app-drawer" id="brandsAppDrawer">
+                        <!-- Brand cards will be inserted here by JavaScript -->
+                    </div>
+
+                    <!-- Brand Dashboard (hidden by default) -->
+                    <div id="brandDashboard" style="display: none;">
+                        <div class="social-filter-row">
+                            <button class="social-back-btn" id="backToBrandsBtn">
+                                <i class="fas fa-arrow-left"></i> Back to Brands
+                            </button>
+                            
+                            <div class="social-month-filter" id="socialMonthFilter">
+                                <!-- Month buttons will be inserted here -->
+                            </div>
+                        </div>
+
+                        <header class="dashboard-header" id="brandDashboardHeader">
+                            <div class="brand-header">
+                                <div class="brand-logo" id="brandDashboardLogo">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <div class="brand-text">
+                                    <div class="brand-name" id="brandDashboardName">Brand Name</div>
+                                    <div class="brand-subtitle" id="brandDashboardSubtitle">Social Media Analytics Dashboard</div>
+                                </div>
+                            </div>
+                        </header>
+
+                        <!-- Platform Tabs -->
+                        <div class="social-platform-tabs" id="platformTabs">
+                            <div class="platform-tab active" data-platform="all">
+                                <i class="fas fa-globe"></i> All Platforms
+                            </div>
+                            <div class="platform-tab" data-platform="instagram">
+                                <div class="social-platform-icon instagram-bg">
+                                    <i class="fab fa-instagram"></i>
+                                </div>
+                                Instagram
+                            </div>
+                            <div class="platform-tab" data-platform="facebook">
+                                <div class="social-platform-icon facebook-bg">
+                                    <i class="fab fa-facebook-f"></i>
+                                </div>
+                                Facebook
+                            </div>
+                            <div class="platform-tab" data-platform="linkedin">
+                                <div class="social-platform-icon linkedin-bg">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </div>
+                                LinkedIn
+                            </div>
+                            <div class="platform-tab" data-platform="youtube">
+                                <div class="social-platform-icon youtube-bg">
+                                    <i class="fab fa-youtube"></i>
+                                </div>
+                                YouTube
+                            </div>
+                        </div>
+
+                        <!-- Platform Stats Overview -->
+                        <div class="platform-stats-row" id="platformStatsRow">
+                            <!-- Platform stats will be inserted here -->
+                        </div>
+
+                        <!-- Social Media KPIs -->
+                        <div class="social-media-grid">
+                            <div class="card glass social-kpi">
+                                <div class="social-kpi-label">Total Followers/Subscribers</div>
+                                <div class="social-kpi-value" id="totalFollowers">0</div>
+                                <div class="social-kpi-change positive">
+                                    <i class="fas fa-arrow-up"></i> <span id="followerGrowth">0%</span> growth this month
+                                </div>
+                            </div>
+                            
+                            <div class="card glass social-kpi">
+                                <div class="social-kpi-label">Total Views/Impressions</div>
+                                <div class="social-kpi-value" id="totalViews">0</div>
+                                <div class="social-kpi-change positive">
+                                    <i class="fas fa-arrow-up"></i> <span id="viewsGrowth">0%</span> increase
+                                </div>
+                            </div>
+                            
+                            <div class="card glass social-kpi">
+                                <div class="social-kpi-label">Engagement Rate</div>
+                                <div class="social-kpi-value" id="engagementRate">0%</div>
+                                <div class="social-kpi-change positive">
+                                    <i class="fas fa-arrow-up"></i> <span id="engagementChange">0%</span> change
+                                </div>
+                            </div>
+                            
+                            <div class="card glass social-kpi">
+                                <div class="social-kpi-label">Paid vs Organic</div>
+                                <div class="social-kpi-value" id="paidOrganicRatio">50/50</div>
+                                <div class="social-kpi-change">
+                                    <span id="paidPercentage">50%</span> Paid • <span id="organicPercentage">50%</span> Organic
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Charts Row -->
+                        <div class="dashboard-grid">
+                            <div class="card glass distribution-chart-container">
+                                <h3 class="card-title"><i class="fas fa-chart-pie"></i> Platform Distribution</h3>
+                                <canvas id="socialPlatformChart" height="150"></canvas>
+                            </div>
+                            
+                            <div class="card glass growth-chart-container">
+                                <h3 class="card-title"><i class="fas fa-chart-line"></i> Follower Growth Trend</h3>
+                                <canvas id="growthChart" height="150"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Detailed Metrics Table -->
+                        <div class="table-container glass">
+                            <h3 class="card-title" style="margin: 15px;"><i class="fas fa-table"></i> Platform-wise Detailed Metrics</h3>
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Platform</th>
+                                        <th>Followers/Subscribers</th>
+                                        <th>Monthly Growth</th>
+                                        <th>Views/Impressions</th>
+                                        <th>Engagement Rate</th>
+                                        <th>Paid Distribution</th>
+                                        <th>Organic Distribution</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="socialMetricsTable">
+                                    <tr>
+                                        <td colspan="7" style="text-align:center; padding: 20px;">Select a platform to view detailed metrics</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- INTEGRATIONS PAGE -->
                 <section class="page" id="integrationsPage">
                     <div class="integration-hero glass">
@@ -1455,17 +2353,41 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
 
                             <div class="sheet-input">
                                 <button id="loadSheetBtn" class="btn btn-success">
-                                    <i class="fas fa-cloud-download-alt"></i> Refresh Data
+                                    <i class="fas fa-cloud-download-alt"></i> Refresh Marketing Data
+                                </button>
+                                <!-- NEW: Social Media Data Refresh Button -->
+                                <button id="loadSocialMediaSheetBtn" class="btn btn-primary">
+                                    <i class="fas fa-sync-alt"></i> Refresh Social Media Data
                                 </button>
                             </div>
 
                             <p style="margin-top: 10px; font-size: 0.85rem; color: var(--text-muted);">
                                 <i class="fas fa-info-circle"></i> If you change the Sheet, update
-                                <b>GOOGLE_SHEET_CSV_URL</b> in the script.
+                                <b>GOOGLE_SHEET_CSV_URL</b> and <b>SOCIAL_MEDIA_SHEET_URL</b> in the script.
                             </p>
 
                             <div class="loading" id="loading">
                                 <i class="fas fa-spinner"></i> Loading data from Google Sheets...
+                            </div>
+                            <div class="loading" id="socialMediaLoading" style="display: none;">
+                                <i class="fas fa-spinner"></i> Loading social media data from Google Sheets...
+                            </div>
+
+                            <div class="card glass" style="margin-top:16px;">
+                                <h3 class="card-title"><i class="fas fa-table-columns"></i> Social Media Sheet Format Required</h3>
+                                <p style="color: var(--text-secondary); line-height: 1.5;">
+                                    Create a separate Google Sheet with this exact header row:<br/>
+                                    <code style="background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 6px; display: inline-block; margin-top: 8px;">
+                                        Month,Brand,Platform,Followers,Monthly Growth %,Views,Engagement Rate %,Paid Distribution %,Organic Distribution %
+                                    </code>
+                                    <br/><br/>
+                                    Example data rows:<br/>
+                                    <code style="background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 6px; display: inline-block; margin-top: 8px;">
+                                        January,AAFM India,Instagram,12500,4.2,152000,3.8,35,65<br/>
+                                        January,AAFM India,Facebook,8500,2.1,89000,2.5,45,55<br/>
+                                        January,AAFM India,LinkedIn,6200,5.7,45000,4.2,25,75
+                                    </code>
+                                </p>
                             </div>
 
                             <div class="card glass" style="margin-top:16px;">
@@ -1484,29 +2406,239 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                     </div>
 
                     <div class="card glass">
-                        <h3 class="card-title"><i class="fas fa-shield-halved"></i> Profile Photo</h3>
+                        <h3 class="card-title"><i class="fas fa-image"></i> Brand Logos Setup</h3>
                         <p style="color: var(--text-secondary); line-height: 1.4;">
-                            Set your profile photo from code (no lockscreen upload). You can edit the value of
-                            <span style="color: rgba(147,197,253,0.95); font-weight:700;">DEFAULT_AVATAR_DATA_URL</span>
-                            in the script, or click the pencil button in the sidebar to set it once (stored in-memory for this session).
+                            To add brand logos to the Social Media Report page, update the <code>brandLogos</code> object in the JavaScript code.
+                            <br/><br/>
+                            You can use:
+                            <ul style="color: var(--text-secondary); margin-left: 20px; margin-top: 10px;">
+                                <li>URLs to online images</li>
+                                <li>Base64 encoded images</li>
+                                <li>Relative paths to local images</li>
+                            </ul>
+                            Example:<br/>
+                            <code style="background: rgba(0,0,0,0.2); padding: 5px 10px; border-radius: 6px; display: inline-block; margin-top: 8px;">
+                                brandLogos["AAFM India"] = "https://example.com/aafm-logo.png";
+                            </code>
                         </p>
                     </div>
                 </section>
+<!-- CONVERSION RATE PAGE -->
+<section class="page" id="conversionRatePage">
+    <div class="integration-hero glass">
+        <h2><i class="fas fa-percentage"></i> Conversion Rate Dashboard</h2>
+        <p>This section is currently under construction. Check back soon for conversion rate analytics and insights!</p>
+    </div>
 
+    <div class="card glass" style="text-align: center; padding: 60px 20px; margin-top: 20px;">
+        <div style="font-size: 5rem; color: var(--accent-blue); margin-bottom: 20px;">
+            <i class="fas fa-tools"></i>
+        </div>
+        
+        <h3 style="font-size: 2rem; margin-bottom: 15px; color: var(--text-primary);">
+            Under Construction
+        </h3>
+        
+        <p style="color: var(--text-secondary); font-size: 1.1rem; max-width: 600px; margin: 0 auto 30px;">
+            The Conversion Rate dashboard is being developed. This section will include detailed 
+            conversion analytics, funnel visualization, and performance metrics across all campaigns.
+        </p>
+        
+        <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+            <div class="kpi" style="width: 200px;">
+                <div class="kpi-label">Planned Features</div>
+                <div class="kpi-value">Coming Soon</div>
+                <div class="kpi-change">
+                    <i class="fas fa-clock"></i> In Development
+                </div>
+            </div>
+            
+            <div class="kpi" style="width: 200px;">
+                <div class="kpi-label">Expected Launch</div>
+                <div class="kpi-value">Q1 2025</div>
+                <div class="kpi-change">
+                    <i class="fas fa-calendar-check"></i> On Schedule
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px; padding: 20px; background: rgba(255,255,255,0.05); border-radius: 16px; max-width: 800px; margin-left: auto; margin-right: auto;">
+            <h4 style="color: var(--text-primary); margin-bottom: 15px;">
+                <i class="fas fa-lightbulb"></i> Planned Features Preview
+            </h4>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; text-align: left;">
+                <div style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div style="color: var(--accent-blue-light); margin-bottom: 8px;">
+                        <i class="fas fa-funnel-dollar"></i> <strong>Conversion Funnel</strong>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Visualize the complete customer journey from impression to conversion
+                    </div>
+                </div>
+                
+                <div style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div style="color: var(--accent-green); margin-bottom: 8px;">
+                        <i class="fas fa-chart-line"></i> <strong>Trend Analysis</strong>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Track conversion rate trends over time with predictive analytics
+                    </div>
+                </div>
+                
+                <div style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div style="color: var(--accent-purple); margin-bottom: 8px;">
+                        <i class="fas fa-balance-scale"></i> <strong>A/B Testing</strong>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Compare conversion rates across different campaigns and creatives
+                    </div>
+                </div>
+                
+                <div style="padding: 15px; background: rgba(255,255,255,0.03); border-radius: 12px;">
+                    <div style="color: var(--accent-yellow); margin-bottom: 8px;">
+                        <i class="fas fa-mobile-alt"></i> <strong>Device Breakdown</strong>
+                    </div>
+                    <div style="color: var(--text-secondary); font-size: 0.9rem;">
+                        Analyze conversion rates by device type and platform
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 40px;">
+            <button class="btn btn-outline" onclick="window.location.href='#integrationsPage'">
+                <i class="fas fa-plug"></i> Back to Integrations
+            </button>
+            <button class="btn btn-primary" style="margin-left: 10px;" onclick="alert('Feature coming soon!')">
+                <i class="fas fa-bell"></i> Notify Me When Ready
+            </button>
+        </div>
+    </div>
+    
+    <footer style="margin-top: 40px;">
+        <p><i class="fas fa-hard-hat"></i> Conversion Rate Dashboard • Under Active Development</p>
+        <p style="margin-top: 5px; font-size: 0.8rem;">Expected completion: Q1 2025</p>
+    </footer>
+</section>
             </div>
         </main>
     </div>
 
     <script>
         // =============================================
+        // MOBILE MENU FUNCTIONALITY
+        // =============================================
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const closeMenuBtn = document.getElementById('closeMenuBtn');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const sidebar = document.querySelector('.sidebar');
+
+        function openSidebar() {
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        if (mobileMenuBtn) {
+            mobileMenuBtn.addEventListener('click', openSidebar);
+        }
+
+        if (closeMenuBtn) {
+            closeMenuBtn.addEventListener('click', closeSidebar);
+        }
+
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', closeSidebar);
+        }
+
+        // Close sidebar when clicking on nav items (mobile)
+        document.querySelectorAll('.nav button').forEach(button => {
+            button.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    closeSidebar();
+                }
+            });
+        });
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 768) {
+                closeSidebar();
+            }
+        });
+
+        // Prevent body scroll when sidebar is open on mobile
+        let touchStartY = 0;
+        sidebar.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        sidebar.addEventListener('touchmove', (e) => {
+            const touchY = e.touches[0].clientY;
+            const scrollTop = sidebar.scrollTop;
+            const height = sidebar.clientHeight;
+            const scrollHeight = sidebar.scrollHeight;
+
+            if (scrollTop === 0 && touchY > touchStartY) {
+                e.preventDefault();
+            }
+            if (scrollTop + height >= scrollHeight && touchY < touchStartY) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // =============================================
         // SETTINGS YOU CAN EDIT IN CODE
         // =============================================
-        const DEFAULT_AVATAR_DATA_URL = "assets/logo.jpg";
+        const DEFAULT_AVATAR_DATA_URL = "assets/aafmlogo.jpg";
         const CORRECT_PASSWORD = "AAFM@2025";
 
-        // ✅ SINGLE PLACE: Put your Google Sheet CSV URL here (only once)
+        // ✅ MARKETING DATA SHEET URL
         const GOOGLE_SHEET_CSV_URL =
             "https://docs.google.com/spreadsheets/d/e/2PACX-1vR38TZfd5P1l7-S3BoKw2dBWZoRyv0wmPxkqvUYhOPm_QhPJEmizK88xzwFZU9NamxVavNOmcaiq-CK/pub?output=csv";
+
+        // ✅ NEW: SOCIAL MEDIA SHEET URL (SEPARATE SHEET)
+        const SOCIAL_MEDIA_SHEET_URL =
+            "https://docs.google.com/spreadsheets/d/e/YOUR_SOCIAL_MEDIA_SHEET_ID/pub?output=csv";
+
+        // ✅ NEW: BRAND LOGOS CONFIGURATION
+        const brandLogos = {
+            "AAFM India": "assets/aafmlogo.jpg",
+            "AAPM India": "assets/aapmlogo.jpg",
+            "NexGen Estate Planning": "assets/nexgen.jpg",
+            "FLAB": "https://via.placeholder.com/70/f59e0b/ffffff?text=FLAB"
+        };
+
+        // =============================================
+        // SOCIAL MEDIA DATA
+        // =============================================
+        let socialMediaData = {
+            brands: {}
+        };
+
+        // =============================================
+        // ANALYTICS DATA
+        // =============================================
+        let analyticsData = {
+            monthlyTrends: [],
+            platformComparison: {},
+            insights: []
+        };
+
+        // Social Media Chart Instances
+        let socialPlatformChartInstance = null;
+        let growthChartInstance = null;
+        let monthlyBudgetChartInstance = null;
+        let platformComparisonChartInstance = null;
+        let currentBrand = null;
+        let currentPlatform = "all";
+        let currentSocialMonth = "all";
 
         // =============================================
         // THEME (DARK/LIGHT) TOGGLE
@@ -1607,11 +2739,19 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
 
                     initializeWithSampleData();
                     loadDataFromSheet(GOOGLE_SHEET_CSV_URL);
+                    
+                    // Load social media data
+                    loadSocialMediaDataFromSheet().then(() => {
+                        renderBrandsAppDrawer();
+                    });
+                    
                     setupPlatformFilter();
                     setupSidebarNavigation();
                     setupCampaignDetailsToggle();
                     setupThemeToggle();
-                    setupDeptHodUI(); // NEW
+                    setupDeptHodUI();
+                    setupSocialMediaPage();
+                    setupMonthSortFilters();
                 }, 260);
             } else {
                 loginError.style.display = 'block';
@@ -1650,20 +2790,6 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
             fileInput.click();
         });
 
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes shake {
-                0%, 100% { transform: translateX(0); }
-                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-                20%, 40%, 60%, 80% { transform: translateX(5px); }
-            }
-            .error-shake {
-                animation: shake 0.5s ease-in-out;
-                border-color: rgba(239, 68, 68, 0.8) !important;
-            }
-        `;
-        document.head.appendChild(style);
-
         function setupSidebarNavigation() {
             const navButtons = document.querySelectorAll('.nav button');
             const pages = document.querySelectorAll('.page');
@@ -1677,6 +2803,17 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                     pages.forEach(p => p.classList.remove('active'));
                     const pageEl = document.getElementById(pageId);
                     if (pageEl) pageEl.classList.add('active');
+
+                    // If social media page is clicked, show brands app drawer
+                    if (pageId === 'socialMediaPage') {
+                        document.getElementById('brandsAppDrawer').style.display = 'grid';
+                        document.getElementById('brandDashboard').style.display = 'none';
+                    }
+
+                    // If analytics page is clicked, update analytics
+                    if (pageId === 'analyticsPage') {
+                        updateAnalyticsPage();
+                    }
 
                     applyAllFiltersAndRender();
                 });
@@ -1734,6 +2871,98 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
         }
 
         // =============================================
+        // MONTH SORT FILTERS (NEW)
+        // =============================================
+        function setupMonthSortFilters() {
+            const campaignMonthSort = document.getElementById('campaignMonthSort');
+            const campaignPageMonthSort = document.getElementById('campaignPageMonthSort');
+
+            if (campaignMonthSort) {
+                campaignMonthSort.addEventListener('change', function() {
+                    sortCampaignDetails(this.value);
+                });
+            }
+
+            if (campaignPageMonthSort) {
+                campaignPageMonthSort.addEventListener('change', function() {
+                    sortCampaignDetailsPage(this.value);
+                });
+            }
+        }
+
+        function sortCampaignDetails(sortType) {
+            const tbody = document.getElementById('campaignDetails');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            if (rows.length <= 1) return;
+            
+            const noDataRow = rows.find(row => row.cells.length === 1);
+            if (noDataRow) {
+                noDataRow.remove();
+            }
+            
+            const dataRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.cells.length > 1);
+            
+            if (dataRows.length === 0) return;
+            
+            dataRows.sort((a, b) => {
+                const monthA = a.cells[8].textContent.trim();
+                const monthB = b.cells[8].textContent.trim();
+                
+                const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                const indexA = monthOrder.indexOf(monthA);
+                const indexB = monthOrder.indexOf(monthB);
+                
+                if (sortType === 'month-asc') {
+                    return indexA - indexB;
+                } else if (sortType === 'month-desc') {
+                    return indexB - indexA;
+                }
+                return 0;
+            });
+            
+            dataRows.forEach(row => tbody.appendChild(row));
+        }
+
+        function sortCampaignDetailsPage(sortType) {
+            const tbody = document.getElementById('campaignDetailsPageBody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            if (rows.length <= 1) return;
+            
+            const noDataRow = rows.find(row => row.cells.length === 1);
+            if (noDataRow) {
+                noDataRow.remove();
+            }
+            
+            const dataRows = Array.from(tbody.querySelectorAll('tr')).filter(row => row.cells.length > 1);
+            
+            if (dataRows.length === 0) return;
+            
+            dataRows.sort((a, b) => {
+                const monthA = a.cells[10].textContent.trim();
+                const monthB = b.cells[10].textContent.trim();
+                
+                const monthOrder = ['January', 'February', 'March', 'April', 'May', 'June', 
+                                  'July', 'August', 'September', 'October', 'November', 'December'];
+                
+                const indexA = monthOrder.indexOf(monthA);
+                const indexB = monthOrder.indexOf(monthB);
+                
+                if (sortType === 'month-asc') {
+                    return indexA - indexB;
+                } else if (sortType === 'month-desc') {
+                    return indexB - indexA;
+                }
+                return 0;
+            });
+            
+            dataRows.forEach(row => tbody.appendChild(row));
+        }
+
+        // =============================================
         // DEPARTMENT + HOD FILTER UI (NEW)
         // =============================================
         function setupDeptHodUI() {
@@ -1772,11 +3001,9 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                 (data || []).map(r => (r.headofdepartment || '').toString().trim()).filter(Boolean)
             )).sort((a,b) => a.localeCompare(b));
 
-            // rebuild options
             deptSel.innerHTML = `<option value="all">All Departments</option>` + departments.map(d => `<option value="${escapeHtml(d)}">${escapeHtml(d)}</option>`).join('');
             hodSel.innerHTML = `<option value="all">All Heads of Department</option>` + hods.map(h => `<option value="${escapeHtml(h)}">${escapeHtml(h)}</option>`).join('');
 
-            // restore selection if still available
             deptSel.value = departments.includes(currentDept) ? currentDept : 'all';
             hodSel.value = hods.includes(currentHod) ? currentHod : 'all';
         }
@@ -1788,6 +3015,1057 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
                 .replaceAll('>','&gt;')
                 .replaceAll('"','&quot;')
                 .replaceAll("'","&#039;");
+        }
+
+        // =============================================
+        // SOCIAL MEDIA PAGE FUNCTIONS
+        // =============================================
+        function setupSocialMediaPage() {
+            renderBrandsAppDrawer();
+            setupSocialMonthFilter();
+            setupPlatformTabs();
+            setupBackToBrandsButton();
+        }
+
+        function renderBrandsAppDrawer() {
+            const appDrawer = document.getElementById('brandsAppDrawer');
+            if (!appDrawer) return;
+
+            appDrawer.innerHTML = '';
+            
+            Object.keys(socialMediaData.brands).forEach(brandName => {
+                const brand = socialMediaData.brands[brandName];
+                const card = document.createElement('div');
+                card.className = `brand-card glass ${brand.colorClass}`;
+                
+                const logoUrl = brandLogos[brandName];
+                let logoHtml = '';
+                
+                if (logoUrl) {
+                    logoHtml = `<img src="${logoUrl}" alt="${brandName} Logo" class="brand-logo-icon-img" onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'${brand.icon}\'></i>';">`;
+                } else {
+                    logoHtml = `<div class="brand-logo-icon ${brand.solidColorClass}"><i class="${brand.icon}"></i></div>`;
+                }
+                
+                card.innerHTML = `
+                    ${logoHtml}
+                    <div class="brand-name">${brandName}</div>
+                    <div class="brand-subtitle">Click to view social media analytics</div>
+                `;
+                
+                card.addEventListener('click', () => showBrandDashboard(brandName));
+                appDrawer.appendChild(card);
+            });
+        }
+
+        function showBrandDashboard(brandName) {
+            currentBrand = brandName;
+            const brand = socialMediaData.brands[brandName];
+            
+            document.getElementById('brandsAppDrawer').style.display = 'none';
+            document.getElementById('brandDashboard').style.display = 'block';
+            
+            document.getElementById('brandDashboardName').textContent = brandName;
+            document.getElementById('brandDashboardSubtitle').textContent = 'Social Media Analytics Dashboard';
+            
+            const logoUrl = brandLogos[brandName];
+            const logoContainer = document.getElementById('brandDashboardLogo');
+            if (logoUrl) {
+                logoContainer.innerHTML = `<img src="${logoUrl}" alt="${brandName} Logo" style="width: 100%; height: 100%; border-radius: 18px; object-fit: cover;" onerror="this.parentNode.innerHTML='<i class=\'${brand.icon}\'></i>';">`;
+            } else {
+                logoContainer.innerHTML = `<i class="${brand.icon}"></i>`;
+            }
+            
+            const header = document.getElementById('brandDashboardHeader');
+            header.className = 'dashboard-header';
+            header.classList.add(brand.solidColorClass);
+            
+            updateSocialMonthFilter();
+            loadBrandSocialMediaData(brandName);
+        }
+
+        function setupSocialMonthFilter() {
+            const monthFilter = document.getElementById('socialMonthFilter');
+            if (!monthFilter) return;
+
+            const months = ['All', 'January', 'February', 'March', 'April', 'May', 'June', 
+                          'July', 'August', 'September', 'October', 'November', 'December'];
+            
+            monthFilter.innerHTML = months.map(month => 
+                `<button class="social-month-btn ${month === 'All' ? 'active' : ''}" 
+                        data-month="${month.toLowerCase()}">${month}</button>`
+            ).join('');
+            
+            monthFilter.querySelectorAll('.social-month-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    monthFilter.querySelectorAll('.social-month-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    currentSocialMonth = this.getAttribute('data-month');
+                    if (currentBrand) {
+                        loadBrandSocialMediaData(currentBrand);
+                    }
+                });
+            });
+        }
+
+        function updateSocialMonthFilter() {
+            const monthFilter = document.getElementById('socialMonthFilter');
+            if (!monthFilter) return;
+            
+            monthFilter.querySelectorAll('.social-month-btn').forEach(btn => {
+                if (btn.getAttribute('data-month') === currentSocialMonth) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        function setupPlatformTabs() {
+            const platformTabs = document.getElementById('platformTabs');
+            if (!platformTabs) return;
+
+            platformTabs.querySelectorAll('.platform-tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    platformTabs.querySelectorAll('.platform-tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    currentPlatform = this.getAttribute('data-platform');
+                    if (currentBrand) {
+                        loadBrandSocialMediaData(currentBrand);
+                    }
+                });
+            });
+        }
+
+        function setupBackToBrandsButton() {
+            const backBtn = document.getElementById('backToBrandsBtn');
+            if (!backBtn) return;
+
+            backBtn.addEventListener('click', function() {
+                document.getElementById('brandsAppDrawer').style.display = 'grid';
+                document.getElementById('brandDashboard').style.display = 'none';
+                currentBrand = null;
+                currentPlatform = 'all';
+                currentSocialMonth = 'all';
+            });
+        }
+
+        function loadBrandSocialMediaData(brandName) {
+            const brand = socialMediaData.brands[brandName];
+            if (!brand) return;
+
+            let totalFollowers = 0;
+            let totalViews = 0;
+            let totalEngagement = 0;
+            let paidPercentage = 0;
+            let organicPercentage = 0;
+            let platformCount = 0;
+
+            const platformsToShow = currentPlatform === 'all' 
+                ? Object.keys(brand.platforms)
+                : [currentPlatform];
+
+            platformsToShow.forEach(platformKey => {
+                const platform = brand.platforms[platformKey];
+                if (platform) {
+                    totalFollowers += platform.followers;
+                    totalViews += platform.views;
+                    totalEngagement += platform.engagement;
+                    paidPercentage += platform.paidPercentage;
+                    organicPercentage += platform.organicPercentage;
+                    platformCount++;
+                }
+            });
+
+            const avgEngagement = platformCount > 0 ? totalEngagement / platformCount : 0;
+            const avgPaidPercentage = platformCount > 0 ? paidPercentage / platformCount : 0;
+            const avgOrganicPercentage = platformCount > 0 ? organicPercentage / platformCount : 0;
+
+            document.getElementById('totalFollowers').textContent = totalFollowers.toLocaleString();
+            document.getElementById('totalViews').textContent = totalViews.toLocaleString();
+            document.getElementById('engagementRate').textContent = avgEngagement.toFixed(1) + '%';
+            document.getElementById('paidOrganicRatio').textContent = 
+                Math.round(avgPaidPercentage) + '/' + Math.round(avgOrganicPercentage);
+            document.getElementById('paidPercentage').textContent = Math.round(avgPaidPercentage) + '%';
+            document.getElementById('organicPercentage').textContent = Math.round(avgOrganicPercentage) + '%';
+
+            let followerGrowth = 0;
+            let viewsGrowth = 0;
+            let engagementChange = 0;
+            
+            if (brand.monthlyData && brand.monthlyData.length >= 2) {
+                const currentMonth = brand.monthlyData[brand.monthlyData.length - 1];
+                const previousMonth = brand.monthlyData[brand.monthlyData.length - 2];
+                
+                if (previousMonth.followers > 0) {
+                    followerGrowth = ((currentMonth.followers - previousMonth.followers) / previousMonth.followers * 100).toFixed(1);
+                }
+                if (previousMonth.views > 0) {
+                    viewsGrowth = ((currentMonth.views - previousMonth.views) / previousMonth.views * 100).toFixed(1);
+                }
+                engagementChange = (currentMonth.engagement - previousMonth.engagement).toFixed(1);
+            }
+
+            document.getElementById('followerGrowth').textContent = followerGrowth + '%';
+            document.getElementById('viewsGrowth').textContent = viewsGrowth + '%';
+            document.getElementById('engagementChange').textContent = engagementChange + '%';
+
+            updatePlatformStatsRow(brand);
+            updateSocialMediaCharts(brand);
+            updateSocialMetricsTable(brand);
+        }
+
+        function updatePlatformStatsRow(brand) {
+            const statsRow = document.getElementById('platformStatsRow');
+            if (!statsRow) return;
+
+            const platformsToShow = currentPlatform === 'all' 
+                ? Object.keys(brand.platforms)
+                : [currentPlatform];
+
+            statsRow.innerHTML = '';
+
+            platformsToShow.forEach(platformKey => {
+                const platform = brand.platforms[platformKey];
+                if (!platform) return;
+
+                const platformNames = {
+                    instagram: 'Instagram',
+                    facebook: 'Facebook',
+                    linkedin: 'LinkedIn',
+                    youtube: 'YouTube'
+                };
+
+                const platformColors = {
+                    instagram: 'instagram-bg',
+                    facebook: 'facebook-bg',
+                    linkedin: 'linkedin-bg',
+                    youtube: 'youtube-bg'
+                };
+
+                const card = document.createElement('div');
+                card.className = 'platform-stat-card glass';
+                card.innerHTML = `
+                    <div class="social-platform-icon ${platformColors[platformKey]}">
+                        <i class="fab fa-${platformKey}"></i>
+                    </div>
+                    <div class="platform-stat-info">
+                        <div class="platform-stat-value">${platform.followers.toLocaleString()}</div>
+                        <div class="platform-stat-label">${platformNames[platformKey]} Followers</div>
+                    </div>
+                `;
+                statsRow.appendChild(card);
+            });
+        }
+
+        function updateSocialMediaCharts(brand) {
+            const platformCtx = document.getElementById('socialPlatformChart').getContext('2d');
+            
+            const platformsToShow = currentPlatform === 'all' 
+                ? Object.entries(brand.platforms)
+                : [[currentPlatform, brand.platforms[currentPlatform]]].filter(([_, data]) => data);
+
+            if (socialPlatformChartInstance) {
+                socialPlatformChartInstance.destroy();
+            }
+
+            if (platformsToShow.length > 0) {
+                socialPlatformChartInstance = new Chart(platformCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: platformsToShow.map(([key, _]) => 
+                            key.charAt(0).toUpperCase() + key.slice(1)),
+                        datasets: [{
+                            data: platformsToShow.map(([_, data]) => data.followers),
+                            backgroundColor: [
+                                'rgba(225, 48, 108, 0.8)',
+                                'rgba(24, 119, 242, 0.8)',
+                                'rgba(0, 119, 181, 0.8)',
+                                'rgba(255, 0, 0, 0.8)'
+                            ],
+                            borderWidth: 2,
+                            borderColor: 'rgba(255, 255, 255, 0.1)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { 
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim(),
+                                    padding: 15
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            const growthCtx = document.getElementById('growthChart').getContext('2d');
+            
+            let monthlyData = brand.monthlyData || [];
+            if (currentSocialMonth !== 'all' && monthlyData.length > 0) {
+                monthlyData = monthlyData.filter(data => 
+                    data.month.toLowerCase() === currentSocialMonth);
+                if (monthlyData.length === 0) {
+                    monthlyData = brand.monthlyData || [];
+                }
+            }
+
+            if (growthChartInstance) {
+                growthChartInstance.destroy();
+            }
+
+            if (monthlyData.length > 0) {
+                growthChartInstance = new Chart(growthCtx, {
+                    type: 'line',
+                    data: {
+                        labels: monthlyData.map(data => data.month),
+                        datasets: [{
+                            label: 'Followers',
+                            data: monthlyData.map(data => data.followers),
+                            borderColor: 'rgba(59, 130, 246, 0.95)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }, {
+                            label: 'Views (in K)',
+                            data: monthlyData.map(data => data.views / 1000),
+                            borderColor: 'rgba(16, 185, 129, 0.95)',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.1)'
+                                },
+                                ticks: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: {
+                                    color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateSocialMetricsTable(brand) {
+            const tableBody = document.getElementById('socialMetricsTable');
+            if (!tableBody) return;
+
+            const platformsToShow = currentPlatform === 'all' 
+                ? Object.entries(brand.platforms)
+                : [[currentPlatform, brand.platforms[currentPlatform]]].filter(([_, data]) => data);
+
+            tableBody.innerHTML = '';
+
+            if (platformsToShow.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding: 20px;">
+                            No platform data available for the selected filter.
+                        </td>
+                    </tr>`;
+                return;
+            }
+
+            platformsToShow.forEach(([platformKey, platform]) => {
+                const platformNames = {
+                    instagram: 'Instagram',
+                    facebook: 'Facebook',
+                    linkedin: 'LinkedIn',
+                    youtube: 'YouTube'
+                };
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${platformNames[platformKey]}</strong></td>
+                    <td>${platform.followers.toLocaleString()}</td>
+                    <td><span class="positive">+${platform.monthlyGrowth.toFixed(1)}%</span></td>
+                    <td>${platform.views.toLocaleString()}</td>
+                    <td>${platform.engagement.toFixed(1)}%</td>
+                    <td>${platform.paidPercentage}%</td>
+                    <td>${platform.organicPercentage}%</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // =============================================
+        // SOCIAL MEDIA SHEET INTEGRATION
+        // =============================================
+        async function loadSocialMediaDataFromSheet() {
+            const loadingEl = document.getElementById('socialMediaLoading');
+            try {
+                loadingEl.style.display = 'block';
+                
+                if (!SOCIAL_MEDIA_SHEET_URL || SOCIAL_MEDIA_SHEET_URL.includes('YOUR_SOCIAL_MEDIA_SHEET_ID')) {
+                    console.log('Using sample social media data');
+                    socialMediaData = getSampleSocialMediaData();
+                    loadingEl.style.display = 'none';
+                    return;
+                }
+
+                const response = await fetch(SOCIAL_MEDIA_SHEET_URL);
+                if (!response.ok) throw new Error('Failed to load social media data');
+                
+                const csvText = await response.text();
+                socialMediaData = parseSocialMediaCSV(csvText);
+                
+                loadingEl.style.display = 'none';
+                return socialMediaData;
+            } catch (error) {
+                console.error('Error loading social media data:', error);
+                socialMediaData = getSampleSocialMediaData();
+                loadingEl.style.display = 'none';
+                return socialMediaData;
+            }
+        }
+
+        function parseSocialMediaCSV(csvText) {
+            const rows = [];
+            const lines = csvText.replace(/\r/g, '').split('\n').filter(Boolean);
+            
+            if (lines.length === 0) return { brands: {} };
+            
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = lines[i].split(',').map(v => v.trim());
+                const row = {};
+                
+                headers.forEach((header, index) => {
+                    row[header] = values[index] || '';
+                });
+                
+                ['followers', 'views'].forEach(key => {
+                    if (row[key]) row[key] = parseInt(row[key].replace(/[^\d.-]/g, '')) || 0;
+                });
+                
+                ['monthly growth %', 'engagement rate %', 'paid distribution %', 'organic distribution %'].forEach(key => {
+                    if (row[key]) row[key] = parseFloat(row[key].replace(/[^\d.-]/g, '')) || 0;
+                });
+                
+                rows.push(row);
+            }
+            
+            const brands = {};
+            const brandMonthlyData = {};
+            
+            rows.forEach(row => {
+                const brandName = row.brand;
+                if (!brandName) return;
+                
+                if (!brands[brandName]) {
+                    brands[brandName] = {
+                        id: Object.keys(brands).length + 1,
+                        colorClass: getBrandColorClass(brandName),
+                        solidColorClass: getBrandSolidColorClass(brandName),
+                        icon: getBrandIcon(brandName),
+                        platforms: {},
+                        monthlyData: []
+                    };
+                    brandMonthlyData[brandName] = {};
+                }
+                
+                const platform = (row.platform || '').toLowerCase();
+                if (platform) {
+                    brands[brandName].platforms[platform] = {
+                        followers: row.followers || 0,
+                        monthlyGrowth: row['monthly growth %'] || 0,
+                        views: row.views || 0,
+                        engagement: row['engagement rate %'] || 0,
+                        paidPercentage: row['paid distribution %'] || 0,
+                        organicPercentage: row['organic distribution %'] || 0
+                    };
+                }
+                
+                const month = row.month;
+                if (month) {
+                    if (!brandMonthlyData[brandName][month]) {
+                        brandMonthlyData[brandName][month] = {
+                            month,
+                            followers: 0,
+                            views: 0,
+                            engagement: 0,
+                            count: 0
+                        };
+                    }
+                    
+                    brandMonthlyData[brandName][month].followers += row.followers || 0;
+                    brandMonthlyData[brandName][month].views += row.views || 0;
+                    brandMonthlyData[brandName][month].engagement += row['engagement rate %'] || 0;
+                    brandMonthlyData[brandName][month].count += 1;
+                }
+            });
+            
+            Object.keys(brands).forEach(brandName => {
+                const monthlyEntries = Object.values(brandMonthlyData[brandName] || {});
+                
+                monthlyEntries.forEach(month => {
+                    if (month.count > 0) {
+                        month.engagement = month.engagement / month.count;
+                        delete month.count;
+                    }
+                });
+                
+                brands[brandName].monthlyData = monthlyEntries.sort((a, b) => 
+                    MONTH_ORDER.indexOf(a.month) - MONTH_ORDER.indexOf(b.month)
+                );
+            });
+            
+            return { brands };
+        }
+
+        function getSampleSocialMediaData() {
+            return {
+                brands: {
+                    "AAFM India": {
+                        id: 1,
+                        colorClass: "aafm-brand",
+                        solidColorClass: "aafm-brand-solid",
+                        icon: "fas fa-chart-line",
+                        platforms: {
+                            instagram: {
+                                followers: 12500,
+                                monthlyGrowth: 4.2,
+                                views: 152000,
+                                engagement: 3.8,
+                                paidPercentage: 35,
+                                organicPercentage: 65
+                            },
+                            facebook: {
+                                followers: 8500,
+                                monthlyGrowth: 2.1,
+                                views: 89000,
+                                engagement: 2.5,
+                                paidPercentage: 45,
+                                organicPercentage: 55
+                            },
+                            linkedin: {
+                                followers: 6200,
+                                monthlyGrowth: 5.7,
+                                views: 45000,
+                                engagement: 4.2,
+                                paidPercentage: 25,
+                                organicPercentage: 75
+                            },
+                            youtube: {
+                                followers: 3200,
+                                monthlyGrowth: 8.3,
+                                views: 125000,
+                                engagement: 6.1,
+                                paidPercentage: 30,
+                                organicPercentage: 70
+                            }
+                        },
+                        monthlyData: [
+                            { month: "January", followers: 28000, views: 350000, engagement: 3.2 },
+                            { month: "February", followers: 29500, views: 380000, engagement: 3.5 },
+                            { month: "March", followers: 31000, views: 410000, engagement: 3.7 },
+                            { month: "April", followers: 32500, views: 390000, engagement: 3.9 },
+                            { month: "May", followers: 34200, views: 425000, engagement: 4.1 },
+                            { month: "June", followers: 36000, views: 450000, engagement: 4.3 },
+                            { month: "July", followers: 37800, views: 480000, engagement: 4.5 },
+                            { month: "August", followers: 39500, views: 510000, engagement: 4.2 },
+                            { month: "September", followers: 41000, views: 540000, engagement: 4.4 },
+                            { month: "October", followers: 42800, views: 580000, engagement: 4.6 },
+                            { month: "November", followers: 44500, views: 620000, engagement: 4.8 },
+                            { month: "December", followers: 46200, views: 670000, engagement: 5.0 }
+                        ]
+                    },
+                    "AAPM India": {
+                        id: 2,
+                        colorClass: "aapm-brand",
+                        solidColorClass: "aapm-brand-solid",
+                        icon: "fas fa-user-tie",
+                        platforms: {
+                            instagram: {
+                                followers: 8400,
+                                monthlyGrowth: 3.8,
+                                views: 98000,
+                                engagement: 3.2,
+                                paidPercentage: 40,
+                                organicPercentage: 60
+                            },
+                            facebook: {
+                                followers: 6200,
+                                monthlyGrowth: 1.9,
+                                views: 72000,
+                                engagement: 2.1,
+                                paidPercentage: 50,
+                                organicPercentage: 50
+                            },
+                            linkedin: {
+                                followers: 5100,
+                                monthlyGrowth: 4.5,
+                                views: 38000,
+                                engagement: 3.8,
+                                paidPercentage: 30,
+                                organicPercentage: 70
+                            },
+                            youtube: {
+                                followers: 2100,
+                                monthlyGrowth: 6.8,
+                                views: 89000,
+                                engagement: 5.4,
+                                paidPercentage: 35,
+                                organicPercentage: 65
+                            }
+                        },
+                        monthlyData: [
+                            { month: "January", followers: 19500, views: 220000, engagement: 2.8 },
+                            { month: "February", followers: 20500, views: 240000, engagement: 3.0 },
+                            { month: "March", followers: 21500, views: 260000, engagement: 3.2 },
+                            { month: "April", followers: 22500, views: 250000, engagement: 3.4 },
+                            { month: "May", followers: 23600, views: 270000, engagement: 3.6 },
+                            { month: "June", followers: 24800, views: 290000, engagement: 3.8 },
+                            { month: "July", followers: 26000, views: 310000, engagement: 4.0 },
+                            { month: "August", followers: 27200, views: 330000, engagement: 3.7 },
+                            { month: "September", followers: 28400, views: 350000, engagement: 3.9 },
+                            { month: "October", followers: 29600, views: 380000, engagement: 4.1 },
+                            { month: "November", followers: 30800, views: 410000, engagement: 4.3 },
+                            { month: "December", followers: 32000, views: 450000, engagement: 4.5 }
+                        ]
+                    },
+                    "NexGen Estate Planning": {
+                        id: 3,
+                        colorClass: "nexgen-brand",
+                        solidColorClass: "nexgen-brand-solid",
+                        icon: "fas fa-home",
+                        platforms: {
+                            instagram: {
+                                followers: 5600,
+                                monthlyGrowth: 5.2,
+                                views: 68000,
+                                engagement: 4.1,
+                                paidPercentage: 30,
+                                organicPercentage: 70
+                            },
+                            facebook: {
+                                followers: 4200,
+                                monthlyGrowth: 3.5,
+                                views: 51000,
+                                engagement: 3.2,
+                                paidPercentage: 40,
+                                organicPercentage: 60
+                            },
+                            linkedin: {
+                                followers: 3800,
+                                monthlyGrowth: 6.8,
+                                views: 29000,
+                                engagement: 4.5,
+                                paidPercentage: 25,
+                                organicPercentage: 75
+                            },
+                            youtube: {
+                                followers: 1500,
+                                monthlyGrowth: 9.2,
+                                views: 62000,
+                                engagement: 6.8,
+                                paidPercentage: 28,
+                                organicPercentage: 72
+                            }
+                        },
+                        monthlyData: [
+                            { month: "January", followers: 13500, views: 150000, engagement: 3.5 },
+                            { month: "February", followers: 14200, views: 165000, engagement: 3.7 },
+                            { month: "March", followers: 14900, views: 180000, engagement: 3.9 },
+                            { month: "April", followers: 15600, views: 170000, engagement: 4.1 },
+                            { month: "May", followers: 16400, views: 185000, engagement: 4.3 },
+                            { month: "June", followers: 17200, views: 200000, engagement: 4.5 },
+                            { month: "July", followers: 18000, views: 215000, engagement: 4.7 },
+                            { month: "August", followers: 18800, views: 230000, engagement: 4.4 },
+                            { month: "September", followers: 19600, views: 245000, engagement: 4.6 },
+                            { month: "October", followers: 20400, views: 265000, engagement: 4.8 },
+                            { month: "November", followers: 21200, views: 285000, engagement: 5.0 },
+                            { month: "December", followers: 22000, views: 310000, engagement: 5.2 }
+                        ]
+                    },
+                    "FLAB": {
+                        id: 4,
+                        colorClass: "flab-brand",
+                        solidColorClass: "flab-brand-solid",
+                        icon: "fas fa-dumbbell",
+                        platforms: {
+                            instagram: {
+                                followers: 18200,
+                                monthlyGrowth: 6.5,
+                                views: 210000,
+                                engagement: 5.2,
+                                paidPercentage: 38,
+                                organicPercentage: 62
+                            },
+                            facebook: {
+                                followers: 12500,
+                                monthlyGrowth: 4.2,
+                                views: 145000,
+                                engagement: 4.1,
+                                paidPercentage: 42,
+                                organicPercentage: 58
+                            },
+                            linkedin: {
+                                followers: 6800,
+                                monthlyGrowth: 7.8,
+                                views: 52000,
+                                engagement: 5.8,
+                                paidPercentage: 22,
+                                organicPercentage: 78
+                            },
+                            youtube: {
+                                followers: 4200,
+                                monthlyGrowth: 11.5,
+                                views: 185000,
+                                engagement: 8.2,
+                                paidPercentage: 32,
+                                organicPercentage: 68
+                            }
+                        },
+                        monthlyData: [
+                            { month: "January", followers: 38500, views: 420000, engagement: 4.2 },
+                            { month: "February", followers: 40500, views: 460000, engagement: 4.5 },
+                            { month: "March", followers: 42500, views: 500000, engagement: 4.8 },
+                            { month: "April", followers: 44500, views: 480000, engagement: 5.1 },
+                            { month: "May", followers: 46700, views: 520000, engagement: 5.4 },
+                            { month: "June", followers: 49000, views: 560000, engagement: 5.7 },
+                            { month: "July", followers: 51300, views: 600000, engagement: 6.0 },
+                            { month: "August", followers: 53600, views: 640000, engagement: 5.7 },
+                            { month: "September", followers: 55900, views: 680000, engagement: 5.9 },
+                            { month: "October", followers: 58200, views: 730000, engagement: 6.1 },
+                            { month: "November", followers: 60500, views: 780000, engagement: 6.3 },
+                            { month: "December", followers: 62800, views: 840000, engagement: 6.5 }
+                        ]
+                    }
+                }
+            };
+        }
+
+        // Helper functions for brand styling
+        function getBrandColorClass(brandName) {
+            const brandColors = {
+                'AAFM India': 'aafm-brand',
+                'AAPM India': 'aapm-brand',
+                'NexGen Estate Planning': 'nexgen-brand',
+                'FLAB': 'flab-brand'
+            };
+            return brandColors[brandName] || 'aafm-brand';
+        }
+
+        function getBrandSolidColorClass(brandName) {
+            const brandColors = {
+                'AAFM India': 'aafm-brand-solid',
+                'AAPM India': 'aapm-brand-solid',
+                'NexGen Estate Planning': 'nexgen-brand-solid',
+                'FLAB': 'flab-brand-solid'
+            };
+            return brandColors[brandName] || 'aafm-brand-solid';
+        }
+
+        function getBrandIcon(brandName) {
+            const brandIcons = {
+                'AAFM India': 'fas fa-chart-line',
+                'AAPM India': 'fas fa-user-tie',
+                'NexGen Estate Planning': 'fas fa-home',
+                'FLAB': 'fas fa-dumbbell'
+            };
+            return brandIcons[brandName] || 'fas fa-chart-line';
+        }
+
+        // =============================================
+        // ANALYTICS PAGE FUNCTIONS
+        // =============================================
+        function updateAnalyticsPage() {
+            if (!campaignData || campaignData.length === 0) return;
+
+            const monthlyAggregates = {};
+            const platformMonthlyAggregates = {};
+            
+            campaignData.forEach(campaign => {
+                const month = campaign.month || 'Unknown';
+                const platform = (campaign.platform || 'Unknown').toLowerCase().includes('google') ? 'Google' : 'Meta';
+                const budget = Number(campaign.budget || 0);
+                const leads = Number(campaign.leads || 0);
+                
+                if (!monthlyAggregates[month]) {
+                    monthlyAggregates[month] = {
+                        month,
+                        totalBudget: 0,
+                        totalLeads: 0,
+                        googleBudget: 0,
+                        metaBudget: 0
+                    };
+                }
+                
+                monthlyAggregates[month].totalBudget += budget;
+                monthlyAggregates[month].totalLeads += leads;
+                
+                if (platform === 'Google') {
+                    monthlyAggregates[month].googleBudget += budget;
+                } else {
+                    monthlyAggregates[month].metaBudget += budget;
+                }
+                
+                if (!platformMonthlyAggregates[month]) {
+                    platformMonthlyAggregates[month] = {};
+                }
+                if (!platformMonthlyAggregates[month][platform]) {
+                    platformMonthlyAggregates[month][platform] = 0;
+                }
+                platformMonthlyAggregates[month][platform] += budget;
+            });
+            
+            const monthlyData = Object.values(monthlyAggregates)
+                .sort((a, b) => MONTH_ORDER.indexOf(a.month) - MONTH_ORDER.indexOf(b.month));
+            
+            updateComparisonCards(monthlyData);
+            updateAnalyticsCharts(monthlyData, platformMonthlyAggregates);
+            updateInsightsTable(monthlyData);
+        }
+
+        function updateComparisonCards(monthlyData) {
+            if (monthlyData.length === 0) return;
+            
+            const currentMonth = monthlyData[monthlyData.length - 1];
+            const previousMonth = monthlyData.length > 1 ? monthlyData[monthlyData.length - 2] : null;
+            
+            if (previousMonth && previousMonth.totalBudget > 0) {
+                const changePercent = ((currentMonth.totalBudget - previousMonth.totalBudget) / previousMonth.totalBudget * 100).toFixed(1);
+                document.getElementById('currentVsPrevious').textContent = Math.abs(changePercent) + '%';
+                const changeEl = document.getElementById('currentVsPreviousChange');
+                changeEl.innerHTML = changePercent >= 0 
+                    ? `<i class="fas fa-arrow-up positive"></i> <span>+${changePercent}% Increase</span>`
+                    : `<i class="fas fa-arrow-down negative"></i> <span>${changePercent}% Decrease</span>`;
+            }
+            
+            const bestMonth = monthlyData.reduce((best, current) => 
+                current.totalBudget > best.totalBudget ? current : best, monthlyData[0]);
+            document.getElementById('bestMonth').textContent = bestMonth.month;
+            document.getElementById('bestMonthBudget').textContent = formatCurrencyFull(bestMonth.totalBudget);
+            
+            const totalBudget = monthlyData.reduce((sum, month) => sum + month.totalBudget, 0);
+            const avgSpend = monthlyData.length > 0 ? totalBudget / monthlyData.length : 0;
+            document.getElementById('avgMonthlySpend').textContent = formatCurrencyFull(avgSpend);
+            document.getElementById('totalMonths').textContent = monthlyData.length;
+        }
+
+        function updateAnalyticsCharts(monthlyData, platformMonthlyAggregates) {
+            const budgetCtx = document.getElementById('monthlyBudgetChart').getContext('2d');
+            
+            if (monthlyBudgetChartInstance) {
+                monthlyBudgetChartInstance.destroy();
+            }
+            
+            monthlyBudgetChartInstance = new Chart(budgetCtx, {
+                type: 'line',
+                data: {
+                    labels: monthlyData.map(m => m.month),
+                    datasets: [{
+                        label: 'Total Budget',
+                        data: monthlyData.map(m => m.totalBudget),
+                        borderColor: 'rgba(59, 130, 246, 0.95)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }, {
+                        label: 'Leads Generated',
+                        data: monthlyData.map(m => m.totalLeads),
+                        borderColor: 'rgba(16, 185, 129, 0.95)',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        yAxisID: 'y1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            type: 'linear',
+                            display: true,
+                            position: 'left',
+                            title: {
+                                display: true,
+                                text: 'Budget (₹)',
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim(),
+                                callback: function(value) {
+                                    if (value >= 100000) return '₹' + (value/100000).toFixed(0) + 'L';
+                                    if (value >= 1000) return '₹' + (value/1000).toFixed(0) + 'K';
+                                    return '₹' + value;
+                                }
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            display: true,
+                            position: 'right',
+                            title: {
+                                display: true,
+                                text: 'Leads',
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                            },
+                            grid: {
+                                drawOnChartArea: false,
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                            }
+                        }
+                    }
+                }
+            });
+            
+            const comparisonCtx = document.getElementById('platformComparisonChart').getContext('2d');
+            const months = monthlyData.map(m => m.month);
+            const googleData = months.map(month => platformMonthlyAggregates[month]?.Google || 0);
+            const metaData = months.map(month => platformMonthlyAggregates[month]?.Meta || 0);
+            
+            if (platformComparisonChartInstance) {
+                platformComparisonChartInstance.destroy();
+            }
+            
+            platformComparisonChartInstance = new Chart(comparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: months,
+                    datasets: [
+                        {
+                            label: 'Google Ads',
+                            data: googleData,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Meta Ads',
+                            data: metaData,
+                            backgroundColor: 'rgba(139, 92, 246, 0.7)',
+                            borderColor: 'rgba(139, 92, 246, 1)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Budget (₹)',
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim(),
+                                callback: function(value) {
+                                    if (value >= 100000) return '₹' + (value/100000).toFixed(0) + 'L';
+                                    if (value >= 1000) return '₹' + (value/1000).toFixed(0) + 'K';
+                                    return '₹' + value;
+                                }
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: getComputedStyle(document.body).getPropertyValue('--text-secondary').trim()
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateInsightsTable(monthlyData) {
+            const tableBody = document.getElementById('monthlyInsightsTable');
+            if (!tableBody) return;
+            
+            tableBody.innerHTML = '';
+            
+            monthlyData.forEach((monthData, index) => {
+                const previousMonth = index > 0 ? monthlyData[index - 1] : null;
+                let growthVsPrevious = '--';
+                let growthClass = '';
+                
+                if (previousMonth && previousMonth.totalBudget > 0) {
+                    const growth = ((monthData.totalBudget - previousMonth.totalBudget) / previousMonth.totalBudget * 100).toFixed(1);
+                    growthVsPrevious = (growth >= 0 ? '+' : '') + growth + '%';
+                    growthClass = growth >= 0 ? 'positive' : 'negative';
+                }
+                
+                const costPerLead = monthData.totalLeads > 0 ? monthData.totalBudget / monthData.totalLeads : 0;
+                
+                const maxCPL = Math.max(...monthlyData.map(m => m.totalLeads > 0 ? m.totalBudget / m.totalLeads : 0));
+                const efficiencyScore = maxCPL > 0 ? Math.round((1 - (costPerLead / maxCPL)) * 100) : 100;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><strong>${monthData.month}</strong></td>
+                    <td class="data-highlight">${formatCurrencyFull(monthData.totalBudget)}</td>
+                    <td>${monthData.totalLeads.toLocaleString()}</td>
+                    <td>${formatCurrencyFull(costPerLead)}</td>
+                    <td><span class="${growthClass}">${growthVsPrevious}</span></td>
+                    <td><span class="${efficiencyScore >= 70 ? 'positive' : efficiencyScore >= 40 ? '' : 'negative'}">${efficiencyScore}%</span></td>
+                `;
+                tableBody.appendChild(row);
+            });
         }
 
         // =============================================
@@ -1822,126 +4100,118 @@ body[data-theme="light"] #courseWisePage .course-filters select option {
             if (amount >= 1000) return '₹' + (amount/1000).toFixed(0) + 'K';
             return '₹' + Math.round(amount);
         }
+        
         function formatCurrencyFull(amount) {
             if (!amount) return '₹0';
             return '₹' + amount.toLocaleString('en-IN');
         }
+        
         function formatCurrencyDecimal(amount) {
             if (!amount) return '₹0.00';
             return '₹' + Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         }
 
-function parseCSV(csvText) {
-    const rows = [];
-    const lines = csvText.replace(/\r/g, '').split('\n').filter(Boolean);
+        function parseCSV(csvText) {
+            const rows = [];
+            const lines = csvText.replace(/\r/g, '').split('\n').filter(Boolean);
 
-    function parseLine(line) {
-        const result = [];
-        let cur = '';
-        let inQuotes = false;
+            function parseLine(line) {
+                const result = [];
+                let cur = '';
+                let inQuotes = false;
 
-        for (let i = 0; i < line.length; i++) {
-            const ch = line[i];
-            const next = line[i + 1];
+                for (let i = 0; i < line.length; i++) {
+                    const ch = line[i];
+                    const next = line[i + 1];
 
-            if (ch === '"' && inQuotes && next === '"') {
-                cur += '"';
-                i++;
-                continue;
-            }
-            if (ch === '"') {
-                inQuotes = !inQuotes;
-                continue;
-            }
-            if (ch === ',' && !inQuotes) {
+                    if (ch === '"' && inQuotes && next === '"') {
+                        cur += '"';
+                        i++;
+                        continue;
+                    }
+                    if (ch === '"') {
+                        inQuotes = !inQuotes;
+                        continue;
+                    }
+                    if (ch === ',' && !inQuotes) {
+                        result.push(cur);
+                        cur = '';
+                        continue;
+                    }
+                    cur += ch;
+                }
                 result.push(cur);
-                cur = '';
-                continue;
-            }
-            cur += ch;
-        }
-        result.push(cur);
-        return result.map(v => v.trim());
-    }
-
-    // Normalizes header keys like:
-    // "Head of Department" -> "headofdepartment"
-    // "Head_Of_Department" -> "headofdepartment"
-    // "HOD" -> "hod"
-    function normKey(k) {
-        return String(k || '')
-            .toLowerCase()
-            .replace(/[^a-z0-9]/g, ''); // remove spaces, underscores, hyphens, etc.
-    }
-
-    const rawHeaders = parseLine(lines[0]);
-    const headers = rawHeaders.map(h => normKey(h));
-
-    // Helper to read a value by multiple possible header keys
-    function getByKeys(obj, keys) {
-        for (const k of keys) {
-            if (obj[k] !== undefined && obj[k] !== '') return obj[k];
-        }
-        return '';
-    }
-
-    for (let i = 1; i < lines.length; i++) {
-        const values = parseLine(lines[i]);
-        if (values.length < headers.length) continue;
-
-        const row = {};
-        headers.forEach((header, idx) => {
-            let value = values[idx] ?? '';
-
-            // numeric normalization
-            if (
-                header.includes('budget') ||
-                header.includes('cost') ||
-                header.includes('lead') ||
-                header.includes('cpc') ||
-                header.includes('click') ||
-                header.includes('impression')
-            ) {
-                const num = parseFloat(String(value).replace(/[^\d.-]/g, ''));
-                value = isNaN(num) ? value : num;
+                return result.map(v => v.trim());
             }
 
-            row[header] = value;
-        });
+            function normKey(k) {
+                return String(k || '')
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]/g, '');
+            }
 
-        // Standardized fields
-        row.campaignname = getByKeys(row, ['campaignname', 'campaign', 'name']);
-        row.platform = getByKeys(row, ['platform', 'channel', 'source']);
-        row.adaccount = getByKeys(row, ['adaccount', 'account', 'adaccountname', 'adaccountid', 'ad_account']);
-        row.adgroup = getByKeys(row, ['adgroup', 'adgroupname', 'ad_group']);
-        row.adset = getByKeys(row, ['adset', 'adsetname', 'ad_set']);
-        row.course = getByKeys(row, ['course', 'program']);
-        row.month = getByKeys(row, ['month', 'period']);
+            const rawHeaders = parseLine(lines[0]);
+            const headers = rawHeaders.map(h => normKey(h));
 
-        // ✅ Department
-        row.department = getByKeys(row, ['department', 'dept', 'departmentname']);
+            function getByKeys(obj, keys) {
+                for (const k of keys) {
+                    if (obj[k] !== undefined && obj[k] !== '') return obj[k];
+                }
+                return '';
+            }
 
-        // ✅ Head of Department (very forgiving)
-        row.headofdepartment = getByKeys(row, [
-            'headofdepartment',
-            'headofdept',
-            'headdepartment',
-            'headdept',
-            'hod',
-            'departmenthead',
-            'depthead',
-            'head'
-        ]);
+            for (let i = 1; i < lines.length; i++) {
+                const values = parseLine(lines[i]);
+                if (values.length < headers.length) continue;
 
-        // Budget / Leads (safe)
-        row.budget = Number(getByKeys(row, ['budget', 'spend', 'amount'])) || 0;
-        row.leads = Number(getByKeys(row, ['leads', 'lead'])) || 0;
+                const row = {};
+                headers.forEach((header, idx) => {
+                    let value = values[idx] ?? '';
 
-        if (row.campaignname && (row.budget !== undefined)) rows.push(row);
-    }
+                    if (
+                        header.includes('budget') ||
+                        header.includes('cost') ||
+                        header.includes('lead') ||
+                        header.includes('cpc') ||
+                        header.includes('click') ||
+                        header.includes('impression')
+                    ) {
+                        const num = parseFloat(String(value).replace(/[^\d.-]/g, ''));
+                        value = isNaN(num) ? value : num;
+                    }
 
-    return rows;
-}
+                    row[header] = value;
+                });
+
+                row.campaignname = getByKeys(row, ['campaignname', 'campaign', 'name']);
+                row.platform = getByKeys(row, ['platform', 'channel', 'source']);
+                row.adaccount = getByKeys(row, ['adaccount', 'account', 'adaccountname', 'adaccountid', 'ad_account']);
+                row.adgroup = getByKeys(row, ['adgroup', 'adgroupname', 'ad_group']);
+                row.adset = getByKeys(row, ['adset', 'adsetname', 'ad_set']);
+                row.course = getByKeys(row, ['course', 'program']);
+                row.month = getByKeys(row, ['month', 'period']);
+
+                row.department = getByKeys(row, ['department', 'dept', 'departmentname']);
+
+                row.headofdepartment = getByKeys(row, [
+                    'headofdepartment',
+                    'headofdept',
+                    'headdepartment',
+                    'headdept',
+                    'hod',
+                    'departmenthead',
+                    'depthead',
+                    'head'
+                ]);
+
+                row.budget = Number(getByKeys(row, ['budget', 'spend', 'amount'])) || 0;
+                row.leads = Number(getByKeys(row, ['leads', 'lead'])) || 0;
+
+                if (row.campaignname && (row.budget !== undefined)) rows.push(row);
+            }
+
+            return rows;
+        }
 
         const MONTH_ORDER = ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
@@ -2102,7 +4372,6 @@ function parseCSV(csvText) {
                 const account = adAccountData[accountName];
                 account.campaigns = [];
 
-                // Only Google campaigns for this account bucket
                 const accountCampaigns = campaignData.filter(c => {
                     const plat = (c.platform || '').toString().toLowerCase();
                     const isGoogle = plat.includes('google');
@@ -2154,7 +4423,6 @@ function parseCSV(csvText) {
             totalSpendElement.textContent = formatCurrencyDecimal(totalGoogleSpend);
         }
 
-        // NEW: Meta single-account report (linked to sheet)
         function updateMetaAdAccountReport() {
             const grid = document.getElementById('metaAdAccountGrid');
             const totalEl = document.getElementById('totalMetaSpend');
@@ -2167,16 +4435,13 @@ function parseCSV(csvText) {
 
             let budget = 0;
             let leads = 0;
-            let cpc = 0; // if your sheet has CPC column (cpc) per row, we can compute weighted/avg; else 0
+            let cpc = 0;
 
             metaCampaigns.forEach(c => {
                 budget += Number(c.budget || 0);
                 leads += Number(c.leads || 0);
-                // if your sheet has a "cpc" column per row, you can compute avg:
-                // cpc += Number(c.cpc || 0);
             });
 
-            // Avg CPC fallback: if you later add clicks, compute properly; keeping safe:
             const avgCpc = metaCampaigns.length ? (cpc / metaCampaigns.length) : 0;
 
             metaAccountData.budget = budget;
@@ -2220,22 +4485,25 @@ function parseCSV(csvText) {
             const monthsSorted = Array.from(monthsSet).sort((a, b) => MONTH_ORDER.indexOf(a) - MONTH_ORDER.indexOf(b));
             createMonthSelector(monthsSorted);
 
-            // NEW: populate Department + HOD dropdowns from sheet data
             populateDeptHodFiltersFromData(data);
 
             updateAdAccountReport();
-            updateMetaAdAccountReport(); // NEW
+            updateMetaAdAccountReport();
             applyAllFiltersAndRender();
+            
+            if (document.getElementById('analyticsPage').classList.contains('active')) {
+                updateAnalyticsPage();
+            }
         }
 
         function updateDashboard(campaigns) {
             const agg = computeAggregates(campaigns);
             updateKPIsFromAgg(agg);
             updateCourseBudgetFromAgg(agg);
-            updateCampaignDetails(campaigns);          // dashboard inline table
-            updateCampaignDetailsPage(campaigns);      // Campaign Details tab
-            updateCourseWiseTableFromAgg(agg);         // Course-Wise tab
-            updateMonthlySummaryPageFromAgg(agg);      // Monthly Summary tab
+            updateCampaignDetails(campaigns);
+            updateCampaignDetailsPage(campaigns);
+            updateCourseWiseTableFromAgg(agg);
+            updateMonthlySummaryPageFromAgg(agg);
             updateChartsFromAgg(agg);
         }
 
@@ -2271,7 +4539,6 @@ function parseCSV(csvText) {
             });
         }
 
-        // Course-Wise Tab table (UPDATED: Department + HOD columns)
         function updateCourseWiseTableFromAgg(agg) {
             const tbody = document.getElementById('courseWiseTableBody');
             if (!tbody) return;
@@ -2299,7 +4566,6 @@ function parseCSV(csvText) {
             });
         }
 
-        // Dashboard inline campaign details
         function updateCampaignDetails(campaigns) {
             const container = document.getElementById('campaignDetails');
 
@@ -2307,7 +4573,7 @@ function parseCSV(csvText) {
                 container.innerHTML = `
                     <tr>
                         <td colspan="9" style="text-align:center; padding: 20px;">
-                            No campaign data available for the selected filter. Click “Refresh Data” in Integrations.
+                            No campaign data available for the selected filter. Click "Refresh Data" in Integrations.
                         </td>
                     </tr>`;
                 return;
@@ -2340,7 +4606,6 @@ function parseCSV(csvText) {
             });
         }
 
-        // Campaign Details Tab (UPDATED: Department + HOD columns)
         function updateCampaignDetailsPage(campaigns) {
             const container = document.getElementById('campaignDetailsPageBody');
             if (!container) return;
@@ -2349,7 +4614,7 @@ function parseCSV(csvText) {
                 container.innerHTML = `
                     <tr>
                         <td colspan="11" style="text-align:center; padding: 20px;">
-                            No campaign data available for the selected filter. Click “Refresh Data” in Integrations.
+                            No campaign data available for the selected filter. Click "Refresh Data" in Integrations.
                         </td>
                     </tr>`;
                 return;
@@ -2384,7 +4649,6 @@ function parseCSV(csvText) {
             });
         }
 
-        // Monthly Summary Tab
         function updateMonthlySummaryPageFromAgg(agg) {
             const container = document.getElementById('monthlySummaryPageBody');
             if (!container) return;
@@ -2510,9 +4774,29 @@ function parseCSV(csvText) {
                         btn.classList.add('btn-primary');
 
                         setTimeout(() => {
-                            btn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Refresh Data';
+                            btn.innerHTML = '<i class="fas fa-cloud-download-alt"></i> Refresh Marketing Data';
                             btn.classList.remove('btn-primary');
                             btn.classList.add('btn-success');
+                        }, 2000);
+                    }
+                });
+            }
+
+            const loadSocialMediaBtn = document.getElementById('loadSocialMediaSheetBtn');
+            if (loadSocialMediaBtn) {
+                loadSocialMediaBtn.addEventListener('click', async function() {
+                    const success = await loadSocialMediaDataFromSheet();
+                    if (success) {
+                        renderBrandsAppDrawer();
+                        const btn = this;
+                        btn.innerHTML = '<i class="fas fa-check"></i> Data Loaded';
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-success');
+
+                        setTimeout(() => {
+                            btn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Social Media Data';
+                            btn.classList.remove('btn-success');
+                            btn.classList.add('btn-primary');
                         }, 2000);
                     }
                 });
